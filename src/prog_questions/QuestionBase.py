@@ -12,9 +12,9 @@ class QuestionBase(ABC):
     def initTemplate(cls, **parameters):
         '''
         Инициализация в параметрах шаблона Twig
-        parameters - любые параметры, необходимые для настройки (сложность, въедливость и т.п.)
-        Ввиду особенностей coderunner и простоты реализации,
-        параметры могут быть типами, поддерживающимися JSON (int, float, str, bool, None, array, dict)
+        parameters - любые параметры, необходимые для настройки (сложность, въедливость и т.п.).
+        Ввиду особенностей coderunner и простоты реализации, параметры могут быть типами,
+        поддерживающимися JSON (int, float, str, bool, None, array, dict)
         '''
         stdinData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
         seed = int(stdinData['seed'])
@@ -24,14 +24,14 @@ class QuestionBase(ABC):
     @classmethod
     def initWithParameters(cls, parameters: str):
         '''
-        Инициализация в основном шаблоне, после инициализации параметров в шаблоне Twig
-        Подразумевается использование только в связке с переменной Twig {{ PARAMETERS }}
+        Инициализация в основном шаблоне, после инициализации параметров шаблона Twig.
+        Подразумевается использование только в связке с Twig параметром PARAMETERS.
         '''
         return cls(**json.loads(parameters))
 
     def getTemplateParameters(self) -> str:
         '''
-        Возвращает JSON данных для шаблонизатора Twig
+        Возвращает параметры в формате JSON для шаблонизатора Twig
         '''
         return json.dumps({
             'QUESTION_NAME': self.questionName,
@@ -45,7 +45,7 @@ class QuestionBase(ABC):
     @abstractmethod
     def questionName(self) -> str:
         '''
-        Имя вопроса
+        Название вопроса
         '''
         ...
 
@@ -61,7 +61,7 @@ class QuestionBase(ABC):
     @abstractmethod
     def preloadedCode(self) -> str:
         '''
-        Код, который автоматически подгружается в поле редактирования кода
+        Код, который подгружается в поле редактирования кода
         '''
         ...
 
@@ -69,7 +69,7 @@ class QuestionBase(ABC):
     def test(self, code: str) -> str:
         '''
         Логика проверки кода
-        code - код, загруженный студентом
+        code - код, отправленный студентом на проверку
         Возвращаемое значение - строка-результат проверки, которую увидит студент.
         Если всё хорошо - вернуть "OK"
         '''
