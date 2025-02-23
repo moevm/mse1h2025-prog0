@@ -1,9 +1,13 @@
 # Документация
 
 ## Интеграция модуля генерации задач в CodeRunner
+
 Для интеграции модуля генерации задач в CodeRunner необходимо в настройках вопроса:
+
 1. В разделе Support Files прикрепляем архив, содержащий модуль генерации задач.
+
 2. В разделе Coderunner Question Type>Template Params необходимо инициализировать вопрос с параметрами шаблонизатора Twig. На примере задачи суммы чисел:
+
 ```python
 import sys
 sys.path.insert(0, 'prog_questions.zip')
@@ -12,9 +16,13 @@ from prog_questions import QuestionSum
 question = QuestionSum.initTemplate()
 print(question.getTemplateParameters())
 ```
+
 В первых трёх строках происходит импорт класса, далее происходит инициализация вопроса с параметрами шаблонизатора Twig.
+
 Также необходимо в разделе Coderunner Question Type>Template Param Controls нажать галочки возле: Hoist template parameters, Twig all, Evaluate per student. В качестве препроцессора выбрать Python3.
+
 3. В разделе Customisation>Template необходимо инициализировать вопрос, используя параметр Twig PARAMETERS и осуществить проверку решения. На примере задачи суммы чисел:
+
 ```python
 import sys
 sys.path.insert(0, 'prog_questions.zip')
@@ -23,9 +31,13 @@ from prog_questions import QuestionSum
 question = QuestionSum.initWithParameters("""{{ PARAMETERS | e('py') }}""")
 print(question.test("""{{ STUDENT_ANSWER | e('py') }}"""))
 ```
+
 В первых трёх строках происходит импорт класса, далее происходит инициализация вопроса с параметром PARAMETERS и вывод результатов проверки кода.
+
 4. В разделе General>Question Name указываем {{ QUESTION_NAME }}, чтобы иметь возможность менять название вопроса внутри кода.
+
 5. В разделе General>Question Text указываем {{ QUESTION_TEXT }}, чтобы иметь возможность менять текст вопроса внутри кода.
+
 6. В разделе Answer Box Reload указываем {{ PRELOADED_CODE }}, чтобы иметь возможность менять предзагруженный код.
 
 ## Класс `QuestionBase` *(Абстрактный)*
