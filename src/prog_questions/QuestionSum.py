@@ -1,7 +1,7 @@
 import subprocess
 import os
 import tempfile
-from QuestionBase import QuestionBase
+from .QuestionBase import QuestionBase
 
 
 QUESTION_TEXT = '''Напишите программу, которая вычисляет сумму чисел.
