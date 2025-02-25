@@ -1,5 +1,47 @@
 # Документация
 
+## Интеграция модуля генерации задач в CodeRunner
+
+Для интеграции модуля генерации задач в CodeRunner необходимо в настройках вопроса:
+
+1. В разделе **Support Files (Поддерживаемые файлы)** прикрепляем архив, содержащий модуль генерации задач.
+
+2. В разделе **Coderunner Question Type>Customise (Тип Вопроса CodeRunner>Настройка)** нажать галочку возле поля *Настроить*.
+
+3. В разделе **Coderunner Question Type>Template Params (Тип Вопроса CodeRunner>Параметры шаблона)** необходимо инициализировать вопрос с параметрами шаблонизатора Twig. На примере задачи суммы чисел:
+
+```python
+import sys
+sys.path.insert(0, 'prog_questions.zip')
+from prog_questions import QuestionSum
+
+question = QuestionSum.initTemplate()
+print(question.getTemplateParameters())
+```
+
+В первых трёх строках происходит импорт класса, далее происходит инициализация вопроса с параметрами шаблонизатора Twig.
+
+4. В разделе **Coderunner Question Type>Template Param Controls (Тип Вопроса CodeRunner>Элементы управления параметрами шаблона)** нажать галочки возле полей: *Hoist template parameters, Twig all, Evaluate per student*. В качестве препроцессора выбрать *Python3*. В случае использования локального Moodle дополнительно выбрать язык *C* в разделе **Advanced Customization > Languages > Ace language**.
+
+5. В разделе **Customisation>Template (Настройка>Шаблон)** необходимо инициализировать вопрос, используя параметр Twig PARAMETERS и осуществить проверку решения. На примере задачи суммы чисел:
+
+```python
+import sys
+sys.path.insert(0, 'prog_questions.zip')
+from prog_questions import QuestionSum
+
+question = QuestionSum.initWithParameters("""{{ PARAMETERS | e('py') }}""")
+print(question.test("""{{ STUDENT_ANSWER | e('py') }}"""))
+```
+
+В первых трёх строках происходит импорт класса, далее происходит инициализация вопроса с параметром PARAMETERS и вывод результатов проверки кода.
+
+6. В разделе **General>Question Name (Общее>Название вопроса)** указываем `{{ QUESTION_NAME }}`, чтобы иметь возможность менять название вопроса внутри кода.
+
+7. В разделе **General>Question Text (Общее>Текст вопроса)** указываем `{{ QUESTION_TEXT }}`, чтобы иметь возможность менять текст вопроса внутри кода.
+
+8. В разделе **Answer Box Reload (Предварительная загрузка поля ответа)** указываем `{{ PRELOADED_CODE }}`, чтобы иметь возможность менять предзагруженный код.
+
 ## Класс `QuestionBase` *(Абстрактный)*
 Абстрактный класс обёртки для задания coderunner.
 
