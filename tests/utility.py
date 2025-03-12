@@ -4,6 +4,14 @@ import json
 
 
 def moodleInit(questionClass: type[QuestionBase], *, seed: int, **parameters) -> QuestionBase:
+    '''
+    Создаёт экземпляр класса вопроса с эмуляцией пробрасывания параметров,
+    как если бы это было запущено в moodle
+    questionClass - тип класса вопроса, экземпляр которого будет создваться
+    seed - сид, с которым будет создаваться вопрос
+    parameters - параметры, с которыми будет создаваться экземпляр
+    Возвращаемое значение - созданный экземпляр класса
+    '''
     old_argv = sys.argv[:]
     sys.argv = ['', f'seed={seed}']
 
