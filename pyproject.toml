@@ -3,3 +3,8 @@ name = "mse1h2025-prog0"
 version = "0.2.0"
 requires-python = ">=3.12"
 dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]
