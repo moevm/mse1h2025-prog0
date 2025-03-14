@@ -1,0 +1,3 @@
+[submodule "external/workshop_risc-v"]
+	path = external/workshop_risc-v
+	url = https://github.com/moevm/workshop_risc-v.git
