@@ -47,3 +47,7 @@ class CProgramRunner:
         :return: Вывод программы
         """
         pass
+
+    def __del__(self):
+        """Очистка временных файлов при удалении объекта"""
+        self.tmp_dir.cleanup()
