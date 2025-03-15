@@ -1,3 +1,6 @@
+import tempfile
+
+
 class CProgramRunner:
     """Класс для компиляции и выполнения C-кода"""
 
@@ -6,7 +9,9 @@ class CProgramRunner:
         Инициализация с компиляцией переданного C-кода
         :param c_code: Исходный код на C в виде строки
         """
-
+        self.c_code = c_code
+        self.tmp_dir = tempfile.TemporaryDirectory()
+        self.executable_path = self._compile()
         pass
 
     def _compile(self) -> str:
