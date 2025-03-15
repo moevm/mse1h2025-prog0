@@ -7,6 +7,12 @@ class CompilationError(Exception):
     """Ошибка компиляции C-кода"""
     pass
 
+class ExecutionError(Exception):
+    """Ошибка выполнения скомпилированной программы"""
+
+    def __init__(self, message: str, exit_code: int):
+        super().__init__(message)
+        self.exit_code = exit_code
 
 class CProgramRunner:
     """Класс для компиляции и выполнения C-кода"""
@@ -54,8 +60,11 @@ class CProgramRunner:
         )
 
         if run_result.returncode != 0:
-            pass
-            # добавить обработку ошибки
+            if run_result.returncode != 0:
+                raise ExecutionError(
+                    message=run_result.stderr.decode(),
+                    exit_code=run_result.returncode
+                )
 
         return run_result.stdout.decode().strip()
 
