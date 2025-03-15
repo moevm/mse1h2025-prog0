@@ -12,6 +12,14 @@ git clone --recursive https://github.com/moevm/mse1h2025-prog0.git
 git submodule update
 ```
 
+# Сборка
+
+Для сборки необходимы зависимости, указанные в `requirements.txt`. Результат сборки помещается в `dist`. Запуск сборки:
+
+```sh
+python build/build.py
+```
+
 # Документация
 
 ## Интеграция модуля генерации задач в CodeRunner

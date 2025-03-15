@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+    <question type="coderunner">
+        <name>
+            <text></text>
+        </name>
+        <questiontext format="html">
+            <text><![CDATA[<p>{{ QUESTION_TEXT }}</p>]]></text>
+        </questiontext>
+        <generalfeedback format="html">
+            <text></text>
+        </generalfeedback>
+        <defaultgrade>1</defaultgrade>
+        <penalty>0</penalty>
+        <hidden>0</hidden>
+        <idnumber></idnumber>
+        <coderunnertype>python3</coderunnertype>
+        <prototypetype>0</prototypetype>
+        <allornothing>1</allornothing>
+        <penaltyregime>0</penaltyregime>
+        <precheck>0</precheck>
+        <hidecheck>0</hidecheck>
+        <showsource>0</showsource>
+        <answerboxlines>18</answerboxlines>
+        <answerboxcolumns>100</answerboxcolumns>
+        <answerpreload>{{ PRELOADED_CODE }}</answerpreload>
+        <globalextra></globalextra>
+        <useace></useace>
+        <resultcolumns></resultcolumns>
+        <template></template>
+        <iscombinatortemplate>0</iscombinatortemplate>
+        <allowmultiplestdins></allowmultiplestdins>
+        <answer></answer>
+        <validateonsave>1</validateonsave>
+        <testsplitterre></testsplitterre>
+        <language></language>
+        <acelang>c</acelang>
+        <sandbox></sandbox>
+        <grader></grader>
+        <cputimelimitsecs></cputimelimitsecs>
+        <memlimitmb></memlimitmb>
+        <sandboxparams></sandboxparams>
+        <templateparams></templateparams>
+        <hoisttemplateparams>1</hoisttemplateparams>
+        <extractcodefromjson>1</extractcodefromjson>
+        <templateparamslang>python3</templateparamslang>
+        <templateparamsevalpertry>1</templateparamsevalpertry>
+        <twigall>1</twigall>
+        <uiplugin></uiplugin>
+        <uiparameters></uiparameters>
+        <attachments>0</attachments>
+        <attachmentsrequired>0</attachmentsrequired>
+        <maxfilesize>10240</maxfilesize>
+        <filenamesregex></filenamesregex>
+        <filenamesexplain></filenamesexplain>
+        <displayfeedback>1</displayfeedback>
+        <giveupallowed>0</giveupallowed>
+        <prototypeextra></prototypeextra>
+        <testcases>
+            <testcase testtype="0" useasexample="0" hiderestiffail="0" mark="1.0000000">
+                <testcode>
+                    <text>#1</text>
+                </testcode>
+                <stdin>
+                    <text></text>
+                </stdin>
+                <expected>
+                    <text>OK</text>
+                </expected>
+                <extra>
+                    <text></text>
+                </extra>
+                <display>
+                    <text>SHOW</text>
+                </display>
+            </testcase>
+        </testcases>
+    </question>
+</quiz>
