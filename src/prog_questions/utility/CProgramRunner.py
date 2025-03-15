@@ -60,11 +60,10 @@ class CProgramRunner:
         )
 
         if run_result.returncode != 0:
-            if run_result.returncode != 0:
-                raise ExecutionError(
-                    message=run_result.stderr.decode(),
-                    exit_code=run_result.returncode
-                )
+            raise ExecutionError(
+                message=run_result.stderr.decode(),
+                exit_code=run_result.returncode
+            )
 
         return run_result.stdout.decode().strip()
 
