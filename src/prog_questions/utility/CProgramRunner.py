@@ -7,12 +7,14 @@ class CompilationError(Exception):
     """Ошибка компиляции C-кода"""
     pass
 
+
 class ExecutionError(Exception):
     """Ошибка выполнения скомпилированной программы"""
 
     def __init__(self, message: str, exit_code: int):
         super().__init__(message)
         self.exit_code = exit_code
+
 
 class CProgramRunner:
     """Класс для компиляции и выполнения C-кода"""
