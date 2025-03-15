@@ -46,7 +46,18 @@ class CProgramRunner:
         :param input_data: Входные данные для программы
         :return: Вывод программы
         """
-        pass
+        run_result = subprocess.run(
+            [self.executable_path],
+            input=input_data.encode(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        if run_result.returncode != 0:
+            pass
+            # добавить обработку ошибки
+
+        return run_result.stdout.decode().strip()
 
     def __del__(self):
         """Очистка временных файлов при удалении объекта"""
