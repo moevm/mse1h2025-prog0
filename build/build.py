@@ -74,7 +74,7 @@ class QuestionDataExtractor(ast.NodeVisitor):
         return self.class_name, self.arguments_node
 
 
-# Шаблоны кода, внедряемых в xml-файл
+# Шаблоны кода, внедряемого в xml-файл
 parameters_code_template = r'''import sys
 sys.path.insert(0, 'prog_questions.zip')
 from prog_questions import {class_name}
