@@ -1,3 +1,4 @@
+from .CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 from .string_operations import generate_operations, generate_input_string, apply_operations, generate_text
 from .QuestionBase import QuestionBase
 
@@ -35,4 +36,14 @@ class QuestionStringOperations(QuestionBase):
         return PRELOADED_CODE
 
     def test(self, code: str) -> str:
-        pass
+        try:
+            runner = CProgramRunner(code)
+            output = runner.run(self.input_string)
+            if output == self.expected_output:
+                return "OK"
+            else:
+                return f"Ошибка: ожидалось '{self.expected_output}', получено '{output}'"
+        except CompilationError as e:
+            return f"Ошибка компиляции: {e}"
+        except ExecutionError as e:
+            return f"Ошибка выполнения (код {e.exit_code}): {e}"
