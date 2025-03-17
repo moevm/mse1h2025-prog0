@@ -48,6 +48,11 @@ class QuestionSum(QuestionBase):
     def preloadedCode(self) -> str:
         return PRELOADED_CODE
 
+    @property
+    def questionExpression(self) -> str:
+        return get_expression(self.vars, self.operations, self.length, self.random_seed, self.minuses_threshold,
+                              self.brackets_treshold, self.minus_symbol, self.all_variables)
+
     def test(self, code: str) -> str:
         # Создание временной директории для файлов
         with tempfile.TemporaryDirectory() as tmp_dir:
