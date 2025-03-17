@@ -1,6 +1,19 @@
 from .string_operations import generate_operations, generate_input_string, apply_operations, generate_text
 from .QuestionBase import QuestionBase
 
+QUESTION_TEXT = """
+TODO
+"""
+
+PRELOADED_CODE = """
+#include <stdio.h>
+
+int main() {
+
+   return 0;
+}
+"""
+
 class QuestionStringOperations(QuestionBase):
     def __init__(self, *, seed: int, num_operations: int):
         super().__init__(seed=seed, num_operations=num_operations)
@@ -11,15 +24,15 @@ class QuestionStringOperations(QuestionBase):
 
     @property
     def questionName(self) -> str:
-        pass
+        return "Операции над строками"
 
     @property
     def questionText(self) -> str:
-        pass
+        return QUESTION_TEXT + '\n' + self.task_description
 
     @property
     def preloadedCode(self) -> str:
-        pass
+        return PRELOADED_CODE
 
     def test(self, code: str) -> str:
         pass
