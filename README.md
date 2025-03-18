@@ -127,3 +127,63 @@ class PrintSeedQuestion(QuestionBase):
         return 'OK'
 
 ```
+
+## Класс `CProgramRunner`
+Класс для компиляции и выполнения программ на языке C.
+
+### Методы класса:
+`__init__(self, c_code: str)` - инициализирует объект класса с компиляцией переданного C-кода
+
+* `c_code` - исходный код на C в виде строки
+* Компилирует код в исполняемый файл и сохраняет путь к нему
+
+`_compile(self) -> str` - компилирует код в исполняемый файл
+* *Возвращаемое значение* - путь к скомпилированному исполняемому файлу
+* *Исключение* - `CompilationError` если компиляция не удалась
+
+`run(self, input_data: str = "") -> str` - запускает скомпилированную программу с передачей входных данных
+* `input_data` - входные данные для программы (по умолчанию пустая строка)
+* *Возвращаемое значение* - вывод программы
+* *Исключение* - `ExecutionError` если выполнение программы завершилось с ошибкой
+
+`__del__(self)` - очищает временные файлы при удалении объекта
+
+### Исключения класса:
+`CompilationError` - исключение, вызываемое при ошибке компиляции C-кода
+
+`ExecutionError` - исключение, вызываемое при ошибке выполнения скомпилированной программы
+* `message` - сообщение об ошибке
+* `exit_code` - код завершения программы
+
+### Пример использования:
+```python
+from CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+
+C_CODE = """
+#include <stdio.h>
+
+int main() {
+    printf("42\\n");
+    return 0;
+}
+"""
+
+try:
+    runner = CProgramRunner(C_CODE)
+    output = runner.run()
+
+    print("Программа успешно выполнена!")
+    print("Вывод программы:", output)
+
+except CompilationError as e:
+    print("Ошибка компиляции:")
+    print(str(e))
+
+except ExecutionError as e:
+    print(f"Ошибка выполнения [{e.exit_code}]: {str(e)}")
+
+except Exception as e:
+    print("Неожиданная ошибка:")
+    print(str(e))
+
+```
