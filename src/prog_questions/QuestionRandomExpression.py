@@ -2,11 +2,8 @@ import subprocess
 import os
 import tempfile
 from .QuestionBase import QuestionBase
-from generators.random_expressions import get_expression
-
-QUESTION_TEXT = f'''Напишите функцию, которая вычисляет значение следующего выражения.
-Значения переменных подаются на вход через stdin, через пробел. Результат надо вернуть.
-'''
+from .generators.random_expressions import get_expression
+import random
 
 PRELOADED_CODE = '''#include <stdio.h>
 
@@ -17,24 +14,27 @@ int main() {
 '''
 
 
-class QuestionSum(QuestionBase):
+class QuestionRandomExpression(QuestionBase):
     """Демонстрационный класс, реализующий задачу сложения чисел"""
 
-    def __init__(self, *, seed: int, difficulty=1, vars: str, operations: str, length: int, random_seed: int,
+    def __init__(self, *, seed: int, difficulty=1, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=1,
                  minuses_threshold=0,
                  brackets_treshold=0, minus_symbol="-", all_variables=False):
-        super().__init__(seseed=seed, difficulty=difficulty, vars=vars, operations=operations, length=length,
-                         random_seed=random_seed, minuses_threshold=minuses_threshold,
+        super().__init__(seed=seed, difficulty=difficulty, vars=vars, operations=operations, length=length,
+                         minuses_threshold=minuses_threshold,
                          brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables)
         self.difficulty = difficulty
         self.vars = vars
         self.operations = operations
         self.length = length
-        self.random_seed = random_seed
         self.minuses_threshold = minuses_threshold
         self.brackets_treshold = brackets_treshold
         self.minus_symbol = minus_symbol
         self.all_variables = all_variables
+        random.seed(self.seed)
+        self.testing_values = [random.randint(0, 100) for _ in self.vars]
+        self.testing_vars = {key:value for key, value in zip(self.vars, self.testing_values)}
+        self.testing_result = eval(self.questionExpression, self.testing_vars)
 
     @property
     def questionName(self) -> str:
@@ -42,7 +42,19 @@ class QuestionSum(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        return QUESTION_TEXT
+        return f'''Напишите функцию, которая вычисляет значение следующего выражения.
+        {self.questionExpression}
+        Значения переменных подаются на вход через stdin, через пробел. Результат надо вернуть в stdout.
+        Перменные расположены в алфавитном порядке(a b c и тд.)
+
+        Количество переменных: {len(self.vars)}
+
+        Пример задачи: {self.questionExpression}
+        Пример входных данных: "{','.join(str(value) for value in self.testing_values)}"
+        Вывод: "{self.testing_result}"
+
+        Список всех операций: "+,-,*,&,|"
+        '''
 
     @property
     def preloadedCode(self) -> str:
@@ -50,7 +62,7 @@ class QuestionSum(QuestionBase):
 
     @property
     def questionExpression(self) -> str:
-        return get_expression(self.vars, self.operations, self.length, self.random_seed, self.minuses_threshold,
+        return get_expression(self.vars, self.operations, self.length, self.seed, self.minuses_threshold,
                               self.brackets_treshold, self.minus_symbol, self.all_variables)
 
     def test(self, code: str) -> str:
