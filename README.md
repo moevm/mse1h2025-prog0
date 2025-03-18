@@ -156,3 +156,34 @@ class PrintSeedQuestion(QuestionBase):
 * `exit_code` - код завершения программы
 
 ### Пример использования:
+```python
+from CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+
+C_CODE = """
+#include <stdio.h>
+
+int main() {
+    printf("42\\n");
+    return 0;
+}
+"""
+
+try:
+    runner = CProgramRunner(C_CODE)
+    output = runner.run()
+
+    print("Программа успешно выполнена!")
+    print("Вывод программы:", output)
+
+except CompilationError as e:
+    print("Ошибка компиляции:")
+    print(str(e))
+
+except ExecutionError as e:
+    print(f"Ошибка выполнения [{e.exit_code}]: {str(e)}")
+
+except Exception as e:
+    print("Неожиданная ошибка:")
+    print(str(e))
+
+```
