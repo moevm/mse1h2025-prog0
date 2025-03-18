@@ -1,9 +1,12 @@
 import subprocess
 import os
 import tempfile
+from cProfile import runctx
+
 from .QuestionBase import QuestionBase
 from .generators.random_expressions import get_expression
 import random
+from .utility.CProgramRunner import CProgramRunner, ExecutionError, CompilationError
 
 PRELOADED_CODE = '''#include <stdio.h>
 
@@ -58,7 +61,7 @@ class QuestionRandomExpression(QuestionBase):
 
     @property
     def preloadedCode(self) -> str:
-        return PRELOADED_CODE
+        return ""
 
     @property
     def questionExpression(self) -> str:
@@ -66,49 +69,26 @@ class QuestionRandomExpression(QuestionBase):
                               self.brackets_treshold, self.minus_symbol, self.all_variables)
 
     def test(self, code: str) -> str:
-        # Создание временной директории для файлов
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            # Сохранение кода студента во временный файл в tmp_dir
-            student_code_path = os.path.join(tmp_dir, 'student_code.c')
-            with open(student_code_path, 'w') as f:
-                f.write(code)
+        try:
 
-            # Компиляция кода студента
-            compile_process = subprocess.run(
-                ['gcc', student_code_path, '-o', os.path.join(tmp_dir, 'student_code')],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=tmp_dir
-            )
-            # Проверка на ошибки компиляции
-            if compile_process.returncode != 0:
-                return f"Ошибка компиляции:\n{compile_process.stderr.decode()}"
+            random.seed(self.seed)
+            testing_values = [random.randint(0, 100000) for _ in self.vars]
+            testing_vars = {key: value for key, value in zip(self.vars, testing_values)}
+            testing_result = eval(self.questionExpression, testing_vars)
+            runner = CProgramRunner(code)
+            output = runner.run(input_data=' '.join(str(value) for value in self.testing_values))
+            if output == testing_result:
+                return "OK"
+            else:
+                return ""
 
-            # Формирование входных данных для программы студента
-            numbers = [1, 2, 3]
-            input_data = ' '.join(map(str, numbers)) + '\n'
-            executable_path = os.path.join(tmp_dir, 'student_code')
+        except CompilationError as e:
+            return "Ошибка компиляции"
 
-            # Выполнение скомпилированного кода с передачей входных данных
-            run_process = subprocess.run(
-                [executable_path],
-                input=input_data.encode(),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=tmp_dir
-            )
-        # Получение данных после выполнения кода
-        output = run_process.stdout.decode().strip()
-        error_output = run_process.stderr.decode().strip()
 
-        # Проверка на ошибки выполнения
-        if run_process.returncode != 0:
-            return f"Ошибка выполнения:\n{error_output}"
+        except ExecutionError as e:
+            return f"Ошибка выполнения [{e.exit_code}]: {str(e)}"
 
-        expected_sum = sum(numbers)
+        except Exception as e:
+            return f"Неожиданная ошибка:{str(e)}"
 
-        # Проверка на совпадение ответов
-        if output == str(expected_sum):
-            return "OK"
-        else:
-            return f"Ошибка: Ожидалось {expected_sum}, получено {output}."
