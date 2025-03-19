@@ -28,22 +28,27 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        a = f"""\
-        TODO: add examples of program work
+        # TODO: add examples of program work
 
-        Напишите программу, которая обрабатывает подаваемый на вход массив согласно следующему условию:
+        base_text = """\
+            Напишите программу, которая обрабатывает подаваемый на вход массив согласно следующему условию:
 
-        {self.task.text}
+            {condition}
 
-        На вход программе в stdin подаётся массив чисел длины {self.task.array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
+            На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
 
-        Пример входных данных:
-        Пример выходных данных:
+            Пример входных данных:
+            Пример выходных данных:
         """
 
-        fixed_indent = a.expandtabs(12)
-        clean_text = dedent(a)
-        return clean_text
+        # clean all tabs and insert f-values
+        cleaned_text = dedent(base_text)
+        result = cleaned_text.format(
+            condition = self.task.text,
+            array_length = self.task.array_length
+        )
+
+        return result
 
     @property
     def preloadedCode(self) -> str:
