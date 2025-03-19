@@ -5,7 +5,16 @@ from .QuestionBase import QuestionBase
 
 
 QUESTION_TEXT = """
-TODO
+Напишите программу, которая обрабатывает подаваемый на вход массив согласно следующему условию:
+
+TODO: add condition from params
+TODO: change N on params value
+TODO: add examples of program work
+
+На вход программе в stdin подаётся массив чисел длины N. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
+
+Пример входных данных:
+Пример выходных данных:
 """
 
 PRELOADED_CODE = """
@@ -19,9 +28,7 @@ int main() {
 
 
 class QuestionRandomCondition(QuestionBase):
-    def __init__(self, *, seed: int, **parameters):
-        self.seed = seed
-        self.parameters = parameters
+
     @property
     @abstractmethod
     def questionName(self) -> str:
