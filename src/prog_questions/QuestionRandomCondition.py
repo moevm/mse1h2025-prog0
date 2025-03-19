@@ -2,22 +2,9 @@ from abc import abstractmethod
 from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 import sys
 import json
+from textwrap import dedent
 from temp import Task
 from QuestionBase import QuestionBase
-
-
-QUESTION_TEXT = """
-Напишите программу, которая обрабатывает подаваемый на вход массив согласно следующему условию:
-
-TODO: add condition from params
-TODO: change N on params value
-TODO: add examples of program work
-
-На вход программе в stdin подаётся массив чисел длины N. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
-
-Пример входных данных:
-Пример выходных данных:
-"""
 
 PRELOADED_CODE = """
 #include <stdio.h>
@@ -41,7 +28,22 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        return QUESTION_TEXT
+        a = f"""\
+        TODO: add examples of program work
+
+        Напишите программу, которая обрабатывает подаваемый на вход массив согласно следующему условию:
+
+        {self.task.text}
+
+        На вход программе в stdin подаётся массив чисел длины {self.task.array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
+
+        Пример входных данных:
+        Пример выходных данных:
+        """
+
+        fixed_indent = a.expandtabs(12)
+        clean_text = dedent(a)
+        return clean_text
 
     @property
     def preloadedCode(self) -> str:
@@ -52,4 +54,4 @@ class QuestionRandomCondition(QuestionBase):
 
 if __name__ == "__main__":
     test = QuestionRandomCondition(seed=52, condition_length=3, array_length=10)
-    print(test.task.text)
+    print(test.questionText)
