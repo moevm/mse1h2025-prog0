@@ -70,17 +70,23 @@ class QuestionRandomExpression(QuestionBase):
 
     def test(self, code: str) -> str:
         try:
-            for i in 10:
+
+            #крайний случай с пустым вводом
+            runner = CProgramRunner(code)
+            output = runner.run('')
+            if output != '':
+                return f"Тест пройден с ошибкой"
+
+            for i in 25:
                 random.seed(self.seed)
                 testing_values = [random.randint(0, 100000) for _ in self.vars]
                 testing_vars = {key: value for key, value in zip(self.vars, testing_values)}
                 testing_result = eval(self.questionExpression, testing_vars)
                 runner = CProgramRunner(code)
                 output = runner.run(input_data=' '.join(str(value) for value in self.testing_values))
-                if output == testing_result:
-                    return "OK"
-                else:
-                    return f"Тест {i} из {10} пройден с ошибкой"
+                if output != testing_result:
+                    return f"Тест {i + 1} из {26} пройден с ошибкой"
+            return "OK"
 
         except CompilationError as e:
             return "Ошибка компиляции"
