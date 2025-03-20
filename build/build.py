@@ -29,18 +29,11 @@ os.unlink(tempfile.name)
 
 
 # Загрузка xml-шаблона вопроса и создание записи об zip-архиве
-file_xml_element = xml.Element('file',
-    name='prog_questions.zip',
-    path='/',
-    encoding='base64',
-)
-file_xml_element.text = zip_base64
-
 with open(XML_TEMPLATE_PATH, 'r', encoding='utf-8') as xml_file:
     xml_parser = xml.XMLParser(strip_cdata=False)
     xml_template = xml.parse(xml_file, xml_parser)
 
-xml_template.xpath('//testcases')[0].append(file_xml_element)
+xml_template.xpath('//file')[0].text = zip_base64
 
 
 # Класс извлечения узла аргументов из конструктора класса
@@ -76,7 +69,7 @@ class QuestionDataExtractor(ast.NodeVisitor):
 
 # Шаблоны кода, внедряемого в xml-файл
 parameters_code_template = r'''import sys
-sys.path.insert(0, 'prog_questions.zip')
+sys.path.insert(0, 'bundle.zip')
 from prog_questions import {class_name}
 
 question = {constructor_code}
@@ -84,7 +77,7 @@ print(question.getTemplateParameters())
 '''
 
 code_template = r'''import sys
-sys.path.insert(0, 'prog_questions.zip')
+sys.path.insert(0, 'bundle.zip')
 from prog_questions import {class_name}
 
 question = {class_name}.initWithParameters("""{{{{ PARAMETERS | e('py') }}}}""")
@@ -125,5 +118,5 @@ for file in target_files:
     pathlib.Path(os.path.dirname(xml_filename)).mkdir(parents=True, exist_ok=True)
 
     # Запись в файл и вывод в консоль
-    xml_template.write(xml_filename, xml_declaration=True, encoding='UTF-8')
+    xml_template.write(xml_filename, xml_declaration=True, encoding='utf-8')
     print(xml_filename)

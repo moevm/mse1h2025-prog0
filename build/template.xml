@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <quiz>
     <question type="coderunner">
         <name>
@@ -74,6 +74,7 @@
                     <text>SHOW</text>
                 </display>
             </testcase>
+            <file name="bundle.zip" path="/" encoding="base64"></file>
         </testcases>
     </question>
 </quiz>
