@@ -36,7 +36,7 @@ file_xml_element = xml.Element('file',
 )
 file_xml_element.text = zip_base64
 
-with open(XML_TEMPLATE_PATH, 'r') as xml_file:
+with open(XML_TEMPLATE_PATH, 'r', encoding='utf-8') as xml_file:
     xml_parser = xml.XMLParser(strip_cdata=False)
     xml_template = xml.parse(xml_file, xml_parser)
 
@@ -94,7 +94,7 @@ print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
 # Проверка для всех файлов проекта
 for file in target_files:
     # Получение информации о классе вопроса из файла
-    with open(os.path.join(SOURCE_DIR, file), 'r') as code_file:
+    with open(os.path.join(SOURCE_DIR, file), 'r', encoding='utf-8') as code_file:
         question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(code_file.read()))
 
     # Если в файле нет класса вопроса - пропускаем
