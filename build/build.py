@@ -1,3 +1,4 @@
+from pathlib import Path
 import tempfile
 import zipfile
 import base64
@@ -5,7 +6,6 @@ import os
 import lxml.etree as xml
 import ast
 import astor
-from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
