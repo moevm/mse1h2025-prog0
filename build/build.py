@@ -9,19 +9,19 @@ import astor
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_DIR = ROOT / 'src'
-OUTPUT_DIR = ROOT / 'dist'
+SOURCE_PATH = ROOT / 'src'
+OUTPUT_PATH = ROOT / 'dist'
 XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
 
 
 # Получение base64 от zip-архива всех файлов проекта
-target_files = [*SOURCE_DIR.glob('**/*.py')]
+target_files = [*SOURCE_PATH.glob('**/*.py')]
 
 zip_tempfile = tempfile.NamedTemporaryFile(delete=False)
 
 with zipfile.ZipFile(zip_tempfile.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
     for file in target_files:
-        zip_file.write(file, file.relative_to(SOURCE_DIR))
+        zip_file.write(file, file.relative_to(SOURCE_PATH))
 
 with open(zip_tempfile.name, 'rb') as f:
     zip_base64 = base64.b64encode(f.read()).decode('ascii')
@@ -116,9 +116,9 @@ for file in target_files:
     xml_template.xpath('//template')[0].text = xml.CDATA(code)
 
     # Создание директорий для выходного файла, если их нет
-    xml_filename = OUTPUT_DIR / f'{question_class}.xml'
-    xml_filename.parent.mkdir(parents=True, exist_ok=True)
+    xml_output_path = OUTPUT_PATH / f'{question_class}.xml'
+    xml_output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Запись в файл и вывод в консоль
-    xml_template.write(xml_filename, xml_declaration=True, encoding='utf-8')
-    print(xml_filename)
+    xml_template.write(xml_output_path, xml_declaration=True, encoding='utf-8')
+    print(xml_output_path)
