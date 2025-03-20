@@ -1,4 +1,3 @@
-import glob
 import tempfile
 import zipfile
 import base64
@@ -6,30 +5,31 @@ import os
 import lxml.etree as xml
 import ast
 import astor
-import pathlib
+from pathlib import Path
 
-SOURCE_DIR = 'src'
-OUTPUT_DIR = 'dist'
-XML_TEMPLATE_PATH = 'build/template.xml'
+ROOT = Path(__file__).resolve().parent.parent
+SOURCE_DIR = ROOT / 'src'
+OUTPUT_DIR = ROOT / 'dist'
+XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
 
 # Получение base64 от zip-архива всех файлов проекта
-target_files = glob.glob('**/*.py', root_dir=SOURCE_DIR, recursive=True)
+target_files = [*SOURCE_DIR.glob('**/*.py')]
 
-tempfile = tempfile.NamedTemporaryFile(delete=False)
+zip_tempfile = tempfile.NamedTemporaryFile(delete=False)
 
-with zipfile.ZipFile(tempfile.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+with zipfile.ZipFile(zip_tempfile.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
     for file in target_files:
-        zip_file.write(os.path.join(SOURCE_DIR, file), file)
+        zip_file.write(file, file.relative_to(SOURCE_DIR))
 
-with open(tempfile.name, 'rb') as f:
+with open(zip_tempfile.name, 'rb') as f:
     zip_base64 = base64.b64encode(f.read()).decode('ascii')
 
-tempfile.close()
-os.unlink(tempfile.name)
+zip_tempfile.close()
+os.unlink(zip_tempfile.name)
 
 
 # Загрузка xml-шаблона вопроса и создание записи об zip-архиве
-with open(XML_TEMPLATE_PATH, 'r', encoding='utf-8') as xml_file:
+with XML_TEMPLATE_PATH.open('r', encoding='utf-8') as xml_file:
     xml_parser = xml.XMLParser(strip_cdata=False)
     xml_template = xml.parse(xml_file, xml_parser)
 
@@ -87,8 +87,7 @@ print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
 # Проверка для всех файлов проекта
 for file in target_files:
     # Получение информации о классе вопроса из файла
-    with open(os.path.join(SOURCE_DIR, file), 'r', encoding='utf-8') as code_file:
-        question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(code_file.read()))
+    question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(file.read_text(encoding='utf-8')))
 
     # Если в файле нет класса вопроса - пропускаем
     if question_class is None:
@@ -114,8 +113,8 @@ for file in target_files:
     xml_template.xpath('//template')[0].text = xml.CDATA(code)
 
     # Создание директорий для выходного файла, если их нет
-    xml_filename = os.path.join(OUTPUT_DIR, f'{question_class}.xml')
-    pathlib.Path(os.path.dirname(xml_filename)).mkdir(parents=True, exist_ok=True)
+    xml_filename = OUTPUT_DIR / f'{question_class}.xml'
+    xml_filename.parent.mkdir(parents=True, exist_ok=True)
 
     # Запись в файл и вывод в консоль
     xml_template.write(xml_filename, xml_declaration=True, encoding='utf-8')
