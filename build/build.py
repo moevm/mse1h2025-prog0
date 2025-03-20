@@ -7,10 +7,12 @@ import ast
 import astor
 from pathlib import Path
 
+
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_DIR = ROOT / 'src'
 OUTPUT_DIR = ROOT / 'dist'
 XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
+
 
 # Получение base64 от zip-архива всех файлов проекта
 target_files = [*SOURCE_DIR.glob('**/*.py')]
@@ -83,6 +85,7 @@ from prog_questions import {class_name}
 question = {class_name}.initWithParameters("""{{{{ PARAMETERS | e('py') }}}}""")
 print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
 '''
+
 
 # Проверка для всех файлов проекта
 for file in target_files:
