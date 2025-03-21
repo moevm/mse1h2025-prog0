@@ -26,6 +26,10 @@ git submodule update
 python build/build.py
 ```
 
+# GitHub Actions
+
+В проекте настроен workflow `.github/workflows/run-tests.yml`, запускающий тесты с отчётом о покрытии и сборку проекта. Workflow запускается при открытии пул реквеста или изменении ветки, связанной с ним, или при взаимодействии с веткой `main`.
+
 # Документация
 
 ## Интеграция модуля генерации задач в CodeRunner
