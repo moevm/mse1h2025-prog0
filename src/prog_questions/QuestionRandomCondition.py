@@ -35,30 +35,30 @@ BASE_TEXT = """\
 EXAMPLE_CODE = """\
 #include <stdio.h>
 
-int main() {
-    long long arr[{arr_length}];
+int main() {{
+    long long arr[{array_length}];
     int i;
 
-    for (int i = 0; i < {arr_length}; i++) {
+    for (int i = 0; i < {array_length}; i++) {{
         scanf("%lld", &arr[i]);
-    }
+    }}
 
-    for (int i = 0; i < {arr_length}; i++) {
+    for (int i = 0; i < {array_length}; i++) {{
         long long prev = (i - 1 >= 0) ? arr[i - 1] : 0;
         long long condition = {condition_string};
-        if (condition {condition_operator} {threshold}) {
+        if (condition {condition_operator} {threshold}) {{
             arr[i] = prev {then_operator} {then_number};
-        } else {
+        }} else {{
             arr[i] = arr[i] {else_operator} {else_number};
-        }
-    }
+        }}
+    }}
 
-    for (i = 0; i < {arr_length}; i++) {
+    for (i = 0; i < {array_length}; i++) {{
         printf("%lld ", arr[i]);
-    }
+    }}
 
     return 0;
-}
+}}
 """
 
 class QuestionRandomCondition(QuestionBase):
@@ -97,6 +97,8 @@ class QuestionRandomCondition(QuestionBase):
         first_string = task_strings[0][5:]
         self.condtition_string = first_string.split(")")[0][2:]
         self.condition_operator = first_string.split(")")[1][1:3]
+        self.then_operator = task_strings[1].split()[-2]
+        self.else_operator = task_strings[2].split()[-2]
 
     def run_sample_code(self, arr: list) -> list:
         condition_string = self.condtition_string
@@ -117,8 +119,21 @@ class QuestionRandomCondition(QuestionBase):
 
     # test specific case
     def test_case(self, arr: list, code: str) -> str:
-        expected_output = " ".join(map(str, self.run_sample_code(arr)))
-        input = str(arr)
+        input = " ".join(map(str, arr))
+
+        example_solution = EXAMPLE_CODE.format(
+            array_length = self.task.array_length,
+            condition_string = self.condtition_string,
+            condition_operator = self.condition_operator,
+            threshold = self.task.threshold,
+            then_number = self.task.then_number,
+            else_number = self.task.else_number,
+            then_operator = self.then_operator,
+            else_operator = self.else_operator
+        )
+
+        expected_output_runner = CProgramRunner(example_solution)
+        expected_output = expected_output_runner.run(input)
 
         try:
             runner = CProgramRunner(code)
