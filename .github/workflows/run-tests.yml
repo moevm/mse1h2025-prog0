@@ -41,7 +41,7 @@ jobs:
       - name: List all built xml files
         run: |
           for file in dist/*; do
-            [ -f "$file" ] && continue
-            echo "Файл: $file"
+            [ -f "$file" ] || continue
+            echo "File: $file"
             cat "$file"
           done
