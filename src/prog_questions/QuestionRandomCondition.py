@@ -1,7 +1,7 @@
-from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 import random
 from textwrap import dedent
-from .generators.random_condition_loop import Task
+from temp import Task
 from .QuestionBase import QuestionBase
 
 PRELOADED_CODE = """\
@@ -72,12 +72,11 @@ int main() {{
 
 class QuestionRandomCondition(QuestionBase):
 
-    def __init__(self, *, seed: int, condition_length: int, array_length: int):
-        super().__init__(seed=seed, condition_length=condition_length, array_length=array_length)
+    def __init__(self, *, seed: int, condition_length: int, array_length: int, strictness: float):
+        super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness)
         self.task = Task(array_length, condition_length, seed)
         self.sample_code = self.task.code
         self.parse(self.task.text)
-        random.seed(seed)
 
     @property
     def questionName(self) -> str:
@@ -157,21 +156,30 @@ class QuestionRandomCondition(QuestionBase):
 
     # test
     def test(self, code: str) -> str:
+        random.seed(seed)
+
         test_result_int_edge = self.test_int_edge_case(code)
         if test_result_int_edge != "OK":
             return test_result_int_edge
 
         random_test_borders = [2, 3, 4, 5, 7, 9]
+        min_tests_number = 20
+        max_tests_number = 50
+        random_test_number = round(min_tests_number + self.parameters['strictness'] * (max_tests_number - min_tests_number))
+        random_test_amount = [random_test_number // len(random_test_borders)] * len(random_test_borders)
+        for ind in range(random_test_number % len(random_test_borders)):
+            random_test_amount[ind] += 1
+        random_test_borders = [2, 3, 4, 5, 7, 9]
 
-        for border in random_test_borders:
-            test_result_random_border = self.test_random(code, 5, border)
+        for ind in range(len(random_test_borders)):
+            test_result_random_border = self.test_random(code, random_test_amount[ind], random_test_borders[ind])
             if test_result_random_border != "OK":
                 return test_result_random_border
 
         return "OK"
 
 if __name__ == "__main__":
-    test = QuestionRandomCondition(seed=52, condition_length=10, array_length=10)
+    test = QuestionRandomCondition(seed=52, condition_length=10, array_length=10, strictness=0.6)
     print(test.questionText)
 
     with open("test.c", "r", encoding="utf-8") as file:
