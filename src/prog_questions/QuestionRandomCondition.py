@@ -1,8 +1,8 @@
-from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 import random
 from textwrap import dedent
-from temp import Task
-from QuestionBase import QuestionBase
+from .generators.random_condition_loop import Task
+from .QuestionBase import QuestionBase
 
 PRELOADED_CODE = """\
 #include <stdio.h>
@@ -105,17 +105,6 @@ class QuestionRandomCondition(QuestionBase):
         self.condition_operator = first_string.split(")")[1][1:3]
         self.then_operator = task_strings[1].split()[-2]
         self.else_operator = task_strings[2].split()[-2]
-
-    def run_sample_code(self, arr: list) -> list:
-        condition_string = self.condtition_string
-        condition_operator = self.condition_operator
-        threshold = self.task.threshold
-        then_number = self.task.then_number
-        else_number = self.task.else_number
-
-        exec(self.sample_code)
-
-        return arr
 
     # test specific case
     def test_case(self, arr: list, code: str) -> str:
