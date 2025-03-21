@@ -10,6 +10,7 @@ on:
 
 jobs:
   test:
+    name: Test project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository code
@@ -25,6 +26,7 @@ jobs:
         run: pytest --cov src/prog_questions --cov-report term-missing
 
   build:
+    name: Build project
     needs: test
     runs-on: ubuntu-latest
     steps:
