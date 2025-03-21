@@ -1,7 +1,7 @@
-from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 import random
 from textwrap import dedent
-from temp import Task
+from .generators.random_condition_loop import Task
 from .QuestionBase import QuestionBase
 
 PRELOADED_CODE = """\
@@ -77,6 +77,7 @@ class QuestionRandomCondition(QuestionBase):
         self.task = Task(array_length, condition_length, seed)
         self.sample_code = self.task.code
         self.parse(self.task.text)
+        self.seed = seed
 
     @property
     def questionName(self) -> str:
@@ -156,7 +157,7 @@ class QuestionRandomCondition(QuestionBase):
 
     # test
     def test(self, code: str) -> str:
-        random.seed(seed)
+        random.seed(self.seed)
 
         test_result_int_edge = self.test_int_edge_case(code)
         if test_result_int_edge != "OK":
