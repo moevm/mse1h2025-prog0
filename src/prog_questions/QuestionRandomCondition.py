@@ -7,13 +7,29 @@ from textwrap import dedent
 from temp import Task
 from QuestionBase import QuestionBase
 
-PRELOADED_CODE = """
+PRELOADED_CODE = """\
 #include <stdio.h>
 
 int main() {
 
    return 0;
 }
+"""
+
+BASE_TEXT = """\
+    Напишите программу, которая обрабатывает подаваемый на вход массив согласно условию. Условие необходимо пересчитывать после каждого изменения массива.
+
+    Ваше условие:
+    {condition}
+
+    Для нулевого элемента массива принять arr[i - 1] = 0
+
+    На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
+
+    Пример входных данных:
+    {example_input}
+    Пример выходных данных:
+    {example_output}
 """
 
 class QuestionRandomCondition(QuestionBase):
@@ -31,31 +47,13 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        # TODO: add examples of program work
-
-        base_text = """\
-            Напишите программу, которая обрабатывает подаваемый на вход массив согласно условию. Условие необходимо пересчитывать после каждого изменения массива.
-
-            Ваше условие:
-            {condition}
-
-            Для нулевого элемента массива принять arr[i - 1] = 0
-
-            На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
-
-            Пример входных данных:
-            {example_input}
-            Пример выходных данных:
-            {example_output}
-        """
-
-        # clean all tabs and insert f-values
-        cleaned_text = dedent(base_text)
+        cleaned_text = dedent(BASE_TEXT)
+        example_arr = [random.randint(1, 100) for _ in range(self.parameters['array_length'])]
         result = cleaned_text.format(
             condition = self.task.text,
             array_length = self.task.array_length,
-            example_input = [random.randint(1, 100) for _ in range(self.parameters['array_length'])],
-            example_output = self.run_sample_code([random.randint(1, 100) for _ in range(self.parameters['array_length'])])
+            example_input = example_arr,
+            example_output = self.run_sample_code(example_arr.copy())
         )
 
         return result
@@ -79,31 +77,42 @@ class QuestionRandomCondition(QuestionBase):
         else_number = self.task.else_number
 
         exec(self.sample_code)
-        #print(arr)
+
         return arr
 
-    # test INT edge case
-    def test_int_edge_case(self):
-        self.run_sample_code([10 ** 10] * self.parameters['array_length'])
-        self.run_sample_code([-10 ** 10] * self.parameters['array_length'])
+    # form test: INT edge case
+    def test_int_edge_case(self, code: str) -> str:
+        out = self.test_case([10 ** 6] * self.parameters['array_length'], code)
+        return out
+        # self.test_case([-10 ** 10] * self.parameters['array_length'], code)
 
-    # test
+    # test specific case
+    def test_case(self, arr: list, code: str) -> str:
+        expected_output = " ".join(map(str, self.run_sample_code(arr)))
+        input = str(arr)
 
-
-    def test(self, code: str) -> str:
         try:
             runner = CProgramRunner(code)
-            output = runner.run(self.input_array)
-            if output == self.expected_output:
+            output = runner.run(input)
+            if output == expected_output:
                 return "OK"
             else:
-                return f"Ошибка: ожидалось '{self.expected_output}', получено '{output}'"
+                return f"Ошибка: ожидалось '{expected_output}', получено '{output}'"
         except CompilationError as e:
             return f"Ошибка компиляции: {e}"
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
 
+    # test
+    def test(self, code: str) -> str:
+        out2 = self.test_int_edge_case(code)
+        return out2
+
 if __name__ == "__main__":
     test = QuestionRandomCondition(seed=52, condition_length=10, array_length=10)
     print(test.questionText)
-    test.test_int_edge_case()
+
+    with open("test.c", "r", encoding="utf-8") as file:
+        c_code = file.read()
+
+    print(test.test_int_edge_case(c_code))
