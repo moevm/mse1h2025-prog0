@@ -32,6 +32,35 @@ BASE_TEXT = """\
     {example_output}
 """
 
+EXAMPLE_CODE = """\
+#include <stdio.h>
+
+int main() {
+    long long arr[{arr_length}];
+    int i;
+
+    for (int i = 0; i < {arr_length}; i++) {
+        scanf("%lld", &arr[i]);
+    }
+
+    for (int i = 0; i < {arr_length}; i++) {
+        long long prev = (i - 1 >= 0) ? arr[i - 1] : 0;
+        long long condition = {condition_string};
+        if (condition {condition_operator} {threshold}) {
+            arr[i] = prev {then_operator} {then_number};
+        } else {
+            arr[i] = arr[i] {else_operator} {else_number};
+        }
+    }
+
+    for (i = 0; i < {arr_length}; i++) {
+        printf("%lld ", arr[i]);
+    }
+
+    return 0;
+}
+"""
+
 class QuestionRandomCondition(QuestionBase):
 
     def __init__(self, *, seed: int, condition_length: int, array_length: int):
