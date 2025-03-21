@@ -1,10 +1,12 @@
 name: Testing and building the project
 on:
   push:
-    branches:
-      - main
-      - feat/github-actions-tests(#24)
+    branches: main
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   test:
