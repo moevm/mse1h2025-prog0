@@ -15,19 +15,19 @@ XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
 
 
 # Получение base64 от zip-архива всех файлов проекта
-target_files = [*SOURCE_PATH.glob('**/*.py')]
+sources = [*SOURCE_PATH.glob('**/*.py')]
 
-zip_tempfile = tempfile.NamedTemporaryFile(delete=False)
+bundle_tempfile = tempfile.NamedTemporaryFile(delete=False)
 
-with zipfile.ZipFile(zip_tempfile.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-    for file in target_files:
-        zip_file.write(file, file.relative_to(SOURCE_PATH))
+with zipfile.ZipFile(bundle_tempfile.name, 'w', zipfile.ZIP_DEFLATED) as bundle_file:
+    for file in sources:
+        bundle_file.write(file, file.relative_to(SOURCE_PATH))
 
-with open(zip_tempfile.name, 'rb') as f:
-    zip_base64 = base64.b64encode(f.read()).decode('ascii')
+with open(bundle_tempfile.name, 'rb') as f:
+    bundle_base64 = base64.b64encode(f.read()).decode('ascii')
 
-zip_tempfile.close()
-os.unlink(zip_tempfile.name)
+bundle_tempfile.close()
+os.unlink(bundle_tempfile.name)
 
 
 # Загрузка xml-шаблона вопроса и создание записи об zip-архиве
@@ -35,7 +35,7 @@ with XML_TEMPLATE_PATH.open('r', encoding='utf-8') as xml_file:
     xml_parser = xml.XMLParser(strip_cdata=False)
     xml_template = xml.parse(xml_file, xml_parser)
 
-xml_template.xpath('//file')[0].text = zip_base64
+xml_template.xpath('//file')[0].text = bundle_base64
 
 
 # Класс извлечения узла аргументов из конструктора класса
@@ -88,7 +88,7 @@ print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
 
 
 # Проверка для всех файлов проекта
-for file in target_files:
+for file in sources:
     # Получение информации о классе вопроса из файла
     question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(file.read_text(encoding='utf-8')))
 
