@@ -107,8 +107,9 @@ class QuestionRandomCondition(QuestionBase):
         self.else_operator = task_strings[2].split()[-2]
 
     # test specific case
-    def test_case(self, arr: list, code: str) -> str:
-        input = " ".join(map(str, arr))
+    def test_case(self, arr: list, code: str, space_amount: int) -> str:
+        separator = " " * space_amount
+        input = separator.join(map(str, arr))
 
         example_solution = EXAMPLE_CODE.format(
             array_length=self.task.array_length,
@@ -137,11 +138,11 @@ class QuestionRandomCondition(QuestionBase):
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
 
     # form test: INT edge case
-    def test_int_edge_case(self, code: str) -> str:
-        upper_edge = self.test_case([10 ** 12] * self.parameters['array_length'], code)
+    def test_int_edge_case(self, code: str, space_amount: int) -> str:
+        upper_edge = self.test_case([10 ** 12] * self.parameters['array_length'], code, 1)
         if upper_edge != "OK":
             return upper_edge
-        lower_edge = self.test_case([-10 ** 12] * self.parameters['array_length'], code)
+        lower_edge = self.test_case([-10 ** 12] * self.parameters['array_length'], code, 1)
         return lower_edge
 
     def test_random(self, code: str, amount: int, upper_border: int) -> str:
@@ -150,7 +151,7 @@ class QuestionRandomCondition(QuestionBase):
             for _ in range(self.parameters['array_length']):
                 test_arr.append(random.randint(-(10**upper_border), 10**upper_border))
 
-            test_result = self.test_case(test_arr, code)
+            test_result = self.test_case(test_arr, code, serial_number + 1)
             if test_result != "OK":
                 return test_result
         return "OK"
