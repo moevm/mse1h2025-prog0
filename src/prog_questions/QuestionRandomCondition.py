@@ -143,13 +143,31 @@ class QuestionRandomCondition(QuestionBase):
         lower_edge = self.test_case([-10 ** 12] * self.parameters['array_length'], code)
         return lower_edge
 
+    def test_random(self, code: str, amount: int, upper_border: int) -> str:
+        for serial_number in range(amount):
+            test_arr = []
+            for _ in range(self.parameters['array_length']):
+                test_arr.append(random.randint(-(10**upper_border), 10**upper_border))
+
+            test_result = self.test_case(test_arr, code)
+            if test_result != "OK":
+                return test_result
+        return "OK"
+
     # test
     def test(self, code: str) -> str:
         test_result_int_edge = self.test_int_edge_case(code)
         if test_result_int_edge != "OK":
             return test_result_int_edge
 
-        return test_result_int_edge
+        random_test_borders = [2, 3, 4, 5, 7, 9]
+
+        for border in random_test_borders:
+            test_result_random_border = self.test_random(code, 5, border)
+            if test_result_random_border != "OK":
+                return test_result_random_border
+
+        return "OK"
 
 if __name__ == "__main__":
     test = QuestionRandomCondition(seed=52, condition_length=10, array_length=10)
@@ -158,4 +176,4 @@ if __name__ == "__main__":
     with open("test.c", "r", encoding="utf-8") as file:
         c_code = file.read()
 
-    print(test.test_int_edge_case(c_code))
+    print(test.test(c_code))
