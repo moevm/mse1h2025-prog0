@@ -86,7 +86,7 @@ class QuestionRandomExpression(QuestionBase):
                 testing_result = eval(self.questionExpression, testing_vars)
                 output = runner.run(input_data=' '.join(str(value) for value in self.testing_values))
                 if output != testing_result:
-                    return f"Тест {i + 1} из {26} пройден с ошибкой"
+                    return f"Тест {i + 1} из {tests_number} пройден с ошибкой"
             return "OK"
 
         except CompilationError as e:
