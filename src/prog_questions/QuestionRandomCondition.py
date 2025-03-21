@@ -1,7 +1,4 @@
-from abc import abstractmethod
 from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
-import sys
-import json
 import random
 from textwrap import dedent
 from temp import Task
@@ -113,9 +110,11 @@ class QuestionRandomCondition(QuestionBase):
 
     # form test: INT edge case
     def test_int_edge_case(self, code: str) -> str:
-        out = self.test_case([10 ** 6] * self.parameters['array_length'], code)
-        return out
-        # self.test_case([-10 ** 10] * self.parameters['array_length'], code)
+        upper_edge = self.test_case([10 ** 6] * self.parameters['array_length'], code)
+        if upper_edge != "OK":
+            return upper_edge
+        lower_edge = self.test_case([-10 ** 10] * self.parameters['array_length'], code)
+        return lower_edge
 
     # test specific case
     def test_case(self, arr: list, code: str) -> str:
