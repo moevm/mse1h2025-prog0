@@ -24,9 +24,9 @@ BASE_TEXT = """\
     На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
 
     Пример входных данных:
-    {example_input}
+    [35, 7, 93, 66, 62, 48, 53, 5, 18, 21]
     Пример выходных данных:
-    {example_output}
+    [51, 23, 77, 82, 46, 32, 37, 21, 2, 5]
 """
 
 EXAMPLE_CODE = """\
@@ -74,12 +74,9 @@ class QuestionRandomCondition(QuestionBase):
     @property
     def questionText(self) -> str:
         cleaned_text = dedent(BASE_TEXT)
-        example_arr = [random.randint(1, 100) for _ in range(self.parameters['array_length'])]
         result = cleaned_text.format(
             condition = self.task.text,
-            array_length = self.task.array_length,
-            example_input = example_arr,
-            example_output = self.run_sample_code(example_arr.copy())
+            array_length = self.task.array_length
         )
 
         return result
@@ -108,27 +105,19 @@ class QuestionRandomCondition(QuestionBase):
 
         return arr
 
-    # form test: INT edge case
-    def test_int_edge_case(self, code: str) -> str:
-        upper_edge = self.test_case([10 ** 6] * self.parameters['array_length'], code)
-        if upper_edge != "OK":
-            return upper_edge
-        lower_edge = self.test_case([-10 ** 10] * self.parameters['array_length'], code)
-        return lower_edge
-
     # test specific case
     def test_case(self, arr: list, code: str) -> str:
         input = " ".join(map(str, arr))
 
         example_solution = EXAMPLE_CODE.format(
-            array_length = self.task.array_length,
-            condition_string = self.condtition_string,
-            condition_operator = self.condition_operator,
-            threshold = self.task.threshold,
-            then_number = self.task.then_number,
-            else_number = self.task.else_number,
-            then_operator = self.then_operator,
-            else_operator = self.else_operator
+            array_length=self.task.array_length,
+            condition_string=self.condtition_string,
+            condition_operator=self.condition_operator,
+            threshold=self.task.threshold,
+            then_number=self.task.then_number,
+            else_number=self.task.else_number,
+            then_operator=self.then_operator,
+            else_operator=self.else_operator
         )
 
         expected_output_runner = CProgramRunner(example_solution)
@@ -146,10 +135,21 @@ class QuestionRandomCondition(QuestionBase):
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
 
+    # form test: INT edge case
+    def test_int_edge_case(self, code: str) -> str:
+        upper_edge = self.test_case([10 ** 12] * self.parameters['array_length'], code)
+        if upper_edge != "OK":
+            return upper_edge
+        lower_edge = self.test_case([-10 ** 12] * self.parameters['array_length'], code)
+        return lower_edge
+
     # test
     def test(self, code: str) -> str:
-        out2 = self.test_int_edge_case(code)
-        return out2
+        test_result_int_edge = self.test_int_edge_case(code)
+        if test_result_int_edge != "OK":
+            return test_result_int_edge
+
+        return test_result_int_edge
 
 if __name__ == "__main__":
     test = QuestionRandomCondition(seed=52, condition_length=10, array_length=10)
