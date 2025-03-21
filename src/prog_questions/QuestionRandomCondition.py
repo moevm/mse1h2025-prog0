@@ -138,7 +138,7 @@ class QuestionRandomCondition(QuestionBase):
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
 
     # form test: INT edge case
-    def test_int_edge_case(self, code: str, space_amount: int) -> str:
+    def test_int_edge_case(self, code: str) -> str:
         upper_edge = self.test_case([10 ** 12] * self.parameters['array_length'], code, 1)
         if upper_edge != "OK":
             return upper_edge
