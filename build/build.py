@@ -1,4 +1,5 @@
 from pathlib import Path
+import shutil
 import tempfile
 import zipfile
 import base64
@@ -12,6 +13,16 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE_PATH = ROOT / 'src'
 OUTPUT_PATH = ROOT / 'dist'
 XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
+
+
+if OUTPUT_PATH.exists():
+    for file in OUTPUT_PATH.iterdir():
+        if file.is_dir():
+            shutil.rmtree(file)
+        else:
+            file.unlink()
+else:
+    OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
 
 
 # Получение base64 от zip-архива всех файлов проекта
@@ -115,10 +126,7 @@ for file in sources:
     xml_template.xpath('//templateparams')[0].text = xml.CDATA(parameters_code)
     xml_template.xpath('//template')[0].text = xml.CDATA(code)
 
-    # Создание директорий для выходного файла, если их нет
-    xml_output_path = OUTPUT_PATH / f'{question_class}.xml'
-    xml_output_path.parent.mkdir(parents=True, exist_ok=True)
-
     # Запись в файл и вывод в консоль
+    xml_output_path = OUTPUT_PATH / f'{question_class}.xml'
     xml_template.write(xml_output_path, xml_declaration=True, encoding='utf-8')
     print(xml_output_path)
