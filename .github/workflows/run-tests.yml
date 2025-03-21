@@ -10,29 +10,35 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Получение кода из репозитория
+      - name: Checkout repository code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_PAT }}
 
-      - name: Установка модулей python
+      - name: Install python modules
         run: pip install -r requirements.txt
 
-      - name: Запуск pytest
+      - name: Run pytest
         run: pytest
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - name: Получение кода из репозитория
+      - name: Checkout repository code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_PAT }}
 
-      - name: Установка модулей python
+      - name: Install python modules
         run: pip install -r requirements.txt
 
-      - name: Сборка проекта в xml
+      - name: Build project into xml
         run: python build/build.py
 
-      - name: Вывод содержимого созданных xml файлов
+      - name: List all built xml files
         run: |
           for file in dist/*; do
             [ -f "$file" ] && continue
