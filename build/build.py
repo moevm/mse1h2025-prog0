@@ -9,12 +9,14 @@ import ast
 import astor
 
 
+# Константы
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE_PATH = ROOT / 'src'
 OUTPUT_PATH = ROOT / 'dist'
 XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
 
 
+# Очистка папки вывода
 if OUTPUT_PATH.exists():
     for file in OUTPUT_PATH.iterdir():
         if file.is_dir():
