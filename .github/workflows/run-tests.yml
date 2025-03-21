@@ -19,8 +19,8 @@ jobs:
       - name: Install python modules
         run: pip install -r requirements.txt
 
-      - name: Run pytest
-        run: pytest
+      - name: Run pytest with coverage report
+        run: pytest --cov src/prog_questions --cov-report term-missing
 
   build:
     needs: test
