@@ -20,13 +20,12 @@ int main() {
 class QuestionRandomExpression(QuestionBase):
     """Демонстрационный класс, реализующий задачу сложения чисел"""
 
-    def __init__(self, *, seed: int, difficulty=1, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=1,
+    def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=1,
                  minuses_threshold=0,
                  brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0):
-        super().__init__(seed=seed, difficulty=difficulty, vars=vars, operations=operations, length=length,
+        super().__init__(seed=seed, vars=vars, operations=operations, length=length,
                          minuses_threshold=minuses_threshold,
                          brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables, strictness=strictness)
-        self.difficulty = difficulty
         self.vars = vars
         self.operations = operations
         self.length = length
@@ -80,12 +79,11 @@ class QuestionRandomExpression(QuestionBase):
             min_tests_number = 20
             max_tests_number = 50
             tests_number = min_tests_number + self.strictness * (max_tests_number - min_tests_number)
+            random.seed(self.seed)
             for i in tests_number:
-                random.seed(self.seed)
                 testing_values = [random.randint(0, 100000) for _ in self.vars]
                 testing_vars = {key: value for key, value in zip(self.vars, testing_values)}
                 testing_result = eval(self.questionExpression, testing_vars)
-                runner = CProgramRunner(code)
                 output = runner.run(input_data=' '.join(str(value) for value in self.testing_values))
                 if output != testing_result:
                     return f"Тест {i + 1} из {26} пройден с ошибкой"
