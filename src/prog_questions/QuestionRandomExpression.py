@@ -77,8 +77,10 @@ class QuestionRandomExpression(QuestionBase):
             output = runner.run('')
             if output != '':
                 return f"Тест пройден с ошибкой"
-
-            for i in 25:
+            min_tests_number = 20
+            max_tests_number = 50
+            tests_number = min_tests_number + self.strictness * (max_tests_number - min_tests_number)
+            for i in tests_number:
                 random.seed(self.seed)
                 testing_values = [random.randint(0, 100000) for _ in self.vars]
                 testing_vars = {key: value for key, value in zip(self.vars, testing_values)}
