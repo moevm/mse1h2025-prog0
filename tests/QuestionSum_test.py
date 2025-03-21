@@ -13,11 +13,13 @@ class TestQuestionSum:
             r'''
             #include <stdio.h>
 
-            void main() {
+            int main() {
                 int sum = 0, next = 0;
                 while (scanf("%d", &next) == 1) sum += next;
 
                 printf("%d\n", sum);
+
+                return 0;
             }
             '''
         ) == 'OK'

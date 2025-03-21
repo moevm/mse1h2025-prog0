@@ -1,0 +1,41 @@
+name: Тестирование и сборка проекта
+on:
+  push:
+    branches:
+      - main
+      - feat/github-actions-tests(#24)
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получение кода из репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка модулей python
+        run: pip install -r requirements.txt
+
+      - name: Запуск pytest
+        run: pytest
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Получение кода из репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка модулей python
+        run: pip install -r requirements.txt
+
+      - name: Сборка проекта в xml
+        run: python build/build.py
+
+      - name: Вывод содержимого созданных xml файлов
+        run: |
+          for file in dist/*; do
+            [ -f "$file" ] && continue
+            echo "Файл: $file"
+            cat "$file"
+          done
