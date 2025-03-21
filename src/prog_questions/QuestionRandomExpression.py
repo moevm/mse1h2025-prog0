@@ -22,10 +22,10 @@ class QuestionRandomExpression(QuestionBase):
 
     def __init__(self, *, seed: int, difficulty=1, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=1,
                  minuses_threshold=0,
-                 brackets_treshold=0, minus_symbol="-", all_variables=False):
+                 brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0):
         super().__init__(seed=seed, difficulty=difficulty, vars=vars, operations=operations, length=length,
                          minuses_threshold=minuses_threshold,
-                         brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables)
+                         brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables, strictness=strictness)
         self.difficulty = difficulty
         self.vars = vars
         self.operations = operations
@@ -38,6 +38,7 @@ class QuestionRandomExpression(QuestionBase):
         self.testing_values = [random.randint(0, 100) for _ in self.vars]
         self.testing_vars = {key:value for key, value in zip(self.vars, self.testing_values)}
         self.testing_result = eval(self.questionExpression, self.testing_vars)
+        self.strictness = strictness
 
     @property
     def questionName(self) -> str:
