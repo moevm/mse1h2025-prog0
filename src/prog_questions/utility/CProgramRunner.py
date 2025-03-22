@@ -20,11 +20,32 @@ class ExitCodeHandler:
     """Обработчик кодов завершения и сигналов"""
 
     def __init__(self):
-        pass
+        self.signal_names = {
+            2: "SIGINT (Interrupt)",
+            3: "SIGQUIT (Quit)",
+            4: "SIGILL (Illegal Instruction)",
+            5: "SIGTRAP (Trap)",
+            6: "SIGABRT (Abort)",
+            7: "SIGBUS (Bus Error)",
+            8: "SIGFPE (Floating Point Exception)",
+            9: "SIGKILL (Kill)",
+            10: "SIGUSR1 (User Signal 1)",
+            11: "SIGSEGV (Segmentation Violation)",
+            12: "SIGUSR2 (User Signal 2)",
+            13: "SIGPIPE (Broken Pipe)",
+            14: "SIGALRM (Alarm)",
+            15: "SIGTERM (Termination)",
+            24: "SIGXCPU (CPU Time Limit Exceeded)",
+            25: "SIGXFSZ (File Size Limit Exceeded)"
+        }
 
     def get_exit_message(self, exit_code):
         """Преобразование кода завершения в текстовое сообщение"""
-        pass
+        if exit_code < 0 or 128 <= exit_code < 160:
+            signal_number = exit_code if exit_code > 0 else -exit_code
+            signal_name = self.signal_names.get(signal_number, f"[{signal_number}]")
+            print(1)
+            return f"Программа завершена сигналом {signal_name}"
 
 
 class CProgramRunner:
