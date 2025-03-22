@@ -110,10 +110,15 @@ for file in sources:
         continue
 
     # Конвертация узла arguments в массив keyword
+    keywords = []
+
     if question_arguments is not None:
-        keywords = [ast.keyword(arg=kw_name, value=kw_value) for kw_name, kw_value in zip(question_arguments.kwonlyargs, question_arguments.kw_defaults) if kw_name.arg != 'seed']
-    else:
-        keywords = []
+        for kw_name, kw_value in zip(question_arguments.kwonlyargs, question_arguments.kw_defaults):
+            if kw_name.arg == 'seed':
+                continue
+
+            kw_name.annotation = None
+            keywords.append(ast.keyword(arg=kw_name, value=kw_value))
 
     # Создание куска кода с вызовом initTemplate со стандартными параметрами (полученными из кода конструктора)
     call_node = ast.Call(func=ast.Attribute(value=ast.Name(id=question_class), attr='initTemplate'), args=[], keywords=keywords)
