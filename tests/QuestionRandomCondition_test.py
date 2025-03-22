@@ -1,13 +1,12 @@
-from prog_questions import QuestionRandomCondition
+from prog_questions import QuestionRandomCondition, utility
 from utility import moodleInit
 
 
 class TestQuestionRandomCondition:
     question = moodleInit(QuestionRandomCondition, seed=52)
-    print(question.questionText)
 
     def test_code_preload(self):
-        assert 'main' in self.question.preloadedCode
+        utility.CProgramRunner.CProgramRunner(self.question.preloadedCode)
 
     def test_task_text(self):
         assert "(arr[0] & arr[7] ^ arr[4] + arr[9]) > 275" in self.question.questionText
