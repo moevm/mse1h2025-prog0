@@ -47,7 +47,7 @@ class ExitCodeHandler:
             255: "Код завершения вне допустимого диапазона"
         }
 
-    def get_exit_message(self, exit_code):
+    def get_exit_message(self, exit_code) -> str:
         """Преобразование кода завершения в текстовое сообщение"""
         if exit_code < 0 or 128 <= exit_code < 160:
             signal_number = exit_code if exit_code > 0 else -exit_code
@@ -94,7 +94,7 @@ class CProgramRunner:
         """
         Запуск скомпилированной программы
         :param input_data: Входные данные для программы
-        :param timeout: Максимальное время выполнения программы
+        :param timeout: Максимальное время выполнения программы в секундах
         :return: Вывод программы
         """
         try:
