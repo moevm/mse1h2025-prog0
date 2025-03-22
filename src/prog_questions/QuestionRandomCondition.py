@@ -33,8 +33,8 @@ BASE_TEXT = """\
         </thead>
         <tbody>
             <tr>
-                <td>[35, 7, 93, 66, 62, 48, 53, 5, 18, 21]</td>
-                <td>[51, 23, 77, 82, 46, 32, 37, 21, 2, 5]</td>
+                <td>35 7 93 66 62 48 53 5 18 21</td>
+                <td>51 23 77 82 46 32 37 21 2 5</td>
             </tr>
         </tbody>
     </table>
@@ -72,7 +72,13 @@ int main() {{
 
 class QuestionRandomCondition(QuestionBase):
 
-    def __init__(self, *, seed: int, condition_length: int, array_length: int, strictness: float):
+    """
+    :param seed: Seed для воспроизводимости тестов.
+    :param condition_length: Длина условия задачи.
+    :param array_length: Длина массива данных.
+    :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
+    """
+    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1):
         super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness)
         self.task = Task(array_length, condition_length, seed)
         self.sample_code = self.task.code
