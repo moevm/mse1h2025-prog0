@@ -68,6 +68,7 @@ class CProgramRunner:
         self.c_code = c_code
         self.tmp_dir = tempfile.TemporaryDirectory()
         self.executable_path = self._compile()
+        self.exit_code_handler = ExitCodeHandler()
 
     def _compile(self) -> str:
         """Компиляция кода в исполняемый файл, возвращает путь к исполняемому файлу"""
