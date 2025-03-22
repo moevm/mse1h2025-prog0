@@ -52,10 +52,8 @@ class ExitCodeHandler:
         if exit_code < 0 or 128 <= exit_code < 160:
             signal_number = exit_code if exit_code > 0 else -exit_code
             signal_name = self.signal_names.get(signal_number, f"[{signal_number}]")
-            print(1)
             return f"Программа завершена сигналом {signal_name}"
         else:
-            print(2)
             return self.exit_codes.get(exit_code, f"Неизвестный код завершения {exit_code}")
 
 
