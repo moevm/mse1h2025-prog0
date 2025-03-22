@@ -1,5 +1,3 @@
-exit(1)
-
 import glob
 import tempfile
 import zipfile
