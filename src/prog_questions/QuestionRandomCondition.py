@@ -1,7 +1,7 @@
 from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 import random
 from textwrap import dedent
-from .generators.random_condition_loop import Task
+from riscv_course.random_expressions.random_condition_loop import Task
 from .QuestionBase import QuestionBase
 
 PRELOADED_CODE = """\
