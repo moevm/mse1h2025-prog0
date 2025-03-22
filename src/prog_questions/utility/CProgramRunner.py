@@ -89,18 +89,22 @@ class CProgramRunner:
 
         return exec_path
 
-    def run(self, input_data: str = "") -> str:
+    def run(self, input_data: str = "", timeout: int = 60) -> str:
         """
         Запуск скомпилированной программы
         :param input_data: Входные данные для программы
         :return: Вывод программы
         """
-        run_result = subprocess.run(
-            [self.executable_path],
-            input=input_data.encode(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+        try:
+            run_result = subprocess.run(
+                [self.executable_path],
+                input=input_data.encode(),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                timeout=timeout
+            )
+        except subprocess.TimeoutExpired:
+            raise ExecutionError("Программа зациклилась или не завершилась в течение {} секунд".format(timeout), -1)
 
         if run_result.returncode != 0:
             raise ExecutionError(
