@@ -16,6 +16,17 @@ class ExecutionError(Exception):
         self.exit_code = exit_code
 
 
+class ExitCodeHandler:
+    """Обработчик кодов завершения и сигналов"""
+
+    def __init__(self):
+        pass
+
+    def get_exit_message(self, exit_code):
+        """Преобразование кода завершения в текстовое сообщение"""
+        pass
+
+
 class CProgramRunner:
     """Класс для компиляции и выполнения C-кода"""
 
