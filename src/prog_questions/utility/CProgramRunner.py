@@ -106,9 +106,10 @@ class CProgramRunner:
         except subprocess.TimeoutExpired:
             raise ExecutionError("Программа зациклилась или не завершилась в течение {} секунд".format(timeout), -1)
 
+        exit_message = self.exit_code_handler.get_exit_message(run_result.returncode)
         if run_result.returncode != 0:
             raise ExecutionError(
-                message=run_result.stderr.decode(),
+                message=exit_message,
                 exit_code=run_result.returncode
             )
 
