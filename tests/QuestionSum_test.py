@@ -19,7 +19,7 @@ class TestQuestionSum:
 
                 printf("%d\n", sum);
 
-                return 1;
+                return 0;
             }
             '''
         ) == 'OK'
