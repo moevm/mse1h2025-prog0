@@ -145,76 +145,9 @@ class QuestionStringOperations(QuestionBase):
                 if result != "OK":
                     return result
 
+            return "OK"
         except CompilationError as e:
             return f"Ошибка компиляции: {e}"
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
-
-
-if __name__ == "__main__":
-    test = QuestionStringOperations(seed=1, num_operations=3, min_length=10, max_length=100, strictness=1)
-    print(test.test("""
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-
-void replace_digits(char *str) {
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (isdigit(str[i])) {
-            str[i] = '0' + (str[i] - '0') % 9;  // Заменяем цифры остатками от деления на 9
-        }
-    }
-}
-
-void convert_vowels_to_lower(char *str) {
-    char vowels[] = "AEIOUYaeiouy";
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (strchr(vowels, str[i])) {
-            str[i] = tolower(str[i]);  // Переводим гласные в нижний регистр
-        }
-    }
-}
-
-void replace_spaces_with_underscores(char *str) {
-    int count = 0;
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ' ') {
-            count++;
-        }
-    }
-
-    int replacement = count % 15;  // Остаток от деления на 15, если число пробелов больше 8
-
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ' ') {
-            // Заменяем пробелы на число символов "_"
-            for (int j = 0; j < replacement; j++) {
-                printf("_");
-            }
-        } else {
-            putchar(str[i]);  // Печатаем остальные символы как есть
-        }
-    }
-}
-
-int main() {
-    char str[101];
-    fgets(str, 101, stdin);  // Ввод строки
-    str[strcspn(str, "\n")] = '\0';  // Удаляем символ новой строки, если есть
-
-    // Применяем операции
-    replace_digits(str);
-    convert_vowels_to_lower(str);
-
-    // Печатаем строку, заменяя пробелы
-    replace_spaces_with_underscores(str);
-
-    printf("\n");
-    return 0;
-}
-
-    """))
-
-"{]|?[%*~&$hUMAn_7%~[(____WWWWWWWWWWWW7WWWWTTWWWWlAtErlIKElY_7WWWWTT7KEEPT7OPEN7____WWWWTT7_7WWWW_OvER__"
-"{]|?[%*~&$hUMAn_0%~[(____WWWWWWWWWWWW0WWWWTTWWWWlAtErlIKElY_0WWWWTT0KEEPT0OPEN0____WWWWTT0_0WWWW_OvER__"
 
