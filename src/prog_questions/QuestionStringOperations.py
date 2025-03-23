@@ -1,6 +1,6 @@
-from .CProgramRunner import CProgramRunner, CompilationError, ExecutionError
-from .string_operations import generate_operations, generate_input_string, apply_operations, generate_text
-from .QuestionBase import QuestionBase
+from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from generators.string_operations import generate_operations, generate_input_string, apply_operations, generate_text
+from QuestionBase import QuestionBase
 
 QUESTION_TEXT = """
 TODO
@@ -15,11 +15,12 @@ int main() {
 }
 """
 
+
 class QuestionStringOperations(QuestionBase):
-    def __init__(self, *, seed: int, num_operations: int):
+    def __init__(self, *, seed: int, num_operations: int, min_length: int, max_length: int):
         super().__init__(seed=seed, num_operations=num_operations)
         self.operations = generate_operations(seed, num_operations)
-        self.input_string = generate_input_string(self.operations, min_length=10, max_length=50)
+        self.input_string = generate_input_string(self.operations, min_length=min_length, max_length=max_length)
         self.expected_output = apply_operations(self.input_string, self.operations)
         self.task_description = generate_text(self.operations)
 
@@ -47,3 +48,10 @@ class QuestionStringOperations(QuestionBase):
             return f"Ошибка компиляции: {e}"
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
+
+
+if __name__ == "__main__":
+    test = QuestionStringOperations(seed=20, num_operations=3, min_length=50, max_length=60)
+    print(test.questionText)
+    print(test.input_string)
+
