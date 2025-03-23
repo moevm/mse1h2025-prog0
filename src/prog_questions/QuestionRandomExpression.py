@@ -63,19 +63,40 @@ class QuestionRandomExpression(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        return f'''Напишите функцию, которая вычисляет значение следующего выражения.
-        {self.questionExpression}
-        Значения переменных подаются на вход через stdin, через пробел. Результат надо вернуть в stdout.
-        Перменные расположены в алфавитном порядке(a b c и тд.)
+        operations_list = ["+", "-", "*", "&", "|"]
+        operations_html = "\n".join(
+            f"<li><code>{op}</code></li>"
+            for op in operations_list
+        )
 
-        Количество переменных: {len(self.vars)}
+        return f"""
+            <h1>Условие задачи</h1>
+            <p>Напишите функцию, которая вычисляет значение следующего выражения:</p>
+            <pre>{self.questionExpression}</pre>
 
-        Пример задачи: {self.questionExpression}
-        Пример входных данных: "{' '.join(str(value) for value in self.testing_values)}"
-        Вывод: "{self.testing_result}"
+            <h4>Формат ввода</h4>
+            <p>На вход через stdin подаются значения {len(self.vars)} переменных в алфавитном порядке ({' '.join(sorted(self.vars))}) через пробел.</p>
 
-        Список всех операций: "+,-,*,&,|"
-        '''
+            <h4>Доступные операции</h4>
+            <ul>
+                {operations_html}
+            </ul>
+
+            <h4>Формат вывода</h4>
+            <p>Результат вычисления выражения должен быть выведен в stdout.</p>
+
+            <h4>Пример</h4>
+            <table>
+                <tr>
+                    <th>Входные данные</th>
+                    <th>Выходные данные</th>
+                </tr>
+                <tr>
+                    <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
+                    <td><code>{self.testing_result}</code></td>
+                </tr>
+            </table>
+            """
 
     @property
     def preloadedCode(self) -> str:
