@@ -54,6 +54,7 @@ jobs:
             [ -f "$file" ] || continue
             echo "File: $file"
             cat "$file"
+            echo
           done
 
       - name: Send failure message to PR
