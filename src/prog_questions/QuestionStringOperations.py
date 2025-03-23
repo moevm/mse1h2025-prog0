@@ -9,7 +9,7 @@ QUESTION_TEXT = """
 <p>Дана строка, содержащая латинские буквы (в верхнем и нижнем регистрах), цифры, пробелы и знаки подчеркивания. Необходимо выполнить над этой строкой одну или несколько операций.</p>
 
 <h2>Формат ввода</h2>
-<p>На вход подается строка длиной от <code>{min_length}</code> до <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы и знаки подчеркивания. Также задается набор операций, которые необходимо применить к строке.</p>
+<p>На вход подается строка длиной до <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы и знаки подчеркивания. Также задается набор операций, которые необходимо применить к строке.</p>
 
 <h2>Операции вашего варианта</h2>
 <ul>
@@ -51,12 +51,12 @@ int main() {
 
 class QuestionStringOperations(QuestionBase):
     def __init__(self, *, seed: int, num_operations: int, min_length: int, max_length: int, strictness: float):
-        super().__init__(seed=seed, num_operations=num_operations)
+        super().__init__(seed=seed, num_operations=num_operations,
+                         min_length=min_length, max_length=max_length, strictness=strictness)
+        self.strictness = strictness
         self.operations = generate_operations(seed, num_operations)
         self.min_length = min_length
         self.max_length = max_length
-        self.input_string = generate_input_string(self.operations, min_length=min_length, max_length=max_length)
-        self.expected_output = apply_operations(self.input_string, self.operations)
 
     @property
     def questionName(self) -> str:
@@ -66,7 +66,6 @@ class QuestionStringOperations(QuestionBase):
     def questionText(self) -> str:
         dedent_question_text = dedent(QUESTION_TEXT)
         return dedent_question_text.format(
-            min_length=self.min_length,
             max_length=self.max_length,
             operations="\n".join(f"<li>{op.get_text()}</li>" for op in self.operations)
         )
@@ -76,7 +75,7 @@ class QuestionStringOperations(QuestionBase):
         return PRELOADED_CODE
 
     def noise_input_string(self, input_string: str):
-        if self.strictness == 0.0 or len(input_string) >= max_length:
+        if self.strictness == 0.0 or len(input_string) >= self.max_length:
             return input_string
 
         noise_chars = "!@#$%^&*()[]{}/?|~"
@@ -91,39 +90,55 @@ class QuestionStringOperations(QuestionBase):
                 new_words.append(word)
                 continue
 
-            if random.random() < strictness:
+            if random.random() < self.strictness:
                 noise = ''.join(random.choices(noise_chars, k=min(noise_level, extra_space)))
-                new_words.append(noise + word)
+                if random.random() < 0.5:
+                    new_words.append(noise + word)
+                else:
+                    new_words.append(word + noise)
                 extra_space -= len(noise)
             else:
                 new_words.append(word)
 
         return " ".join(new_words)
 
-    def test_case(self, runner: CProgramRunner, input_string: str):
-        pass
-
-    def boundary_test_case(self):
-        pass
+    def test_case(self, runner: CProgramRunner, input_string: str, noise: bool = True):
+        if noise:
+            input_string = self.noise_input_string(input_string)
+        output = runner.run(input_string)
+        expected_output = apply_operations(input_string, self.operations)
+        if output == expected_output:
+            return "OK"
+        else:
+            return f"Ошибка: ожидалось '{expected_output}', получено '{output}'"
 
     def test(self, code: str) -> str:
         try:
             random.seed(self.seed)
             runner = CProgramRunner(code)
-            output = runner.run(self.input_string)
-            if output == self.expected_output:
-                return "OK"
-            else:
-                return f"Ошибка: ожидалось '{self.expected_output}', получено '{output}'"
+
+            boundary_inputs = [
+                "", "A", "A" * self.max_length,
+                "123467890", "___  __   _", "     ",
+                "BCDFG", "AEIOUY"
+            ]
+
+            random_count = 20 + self.strictness * 30
+            random_inputs = [
+                generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(random_count)
+            ]
+
+            for input_string in boundary_inputs:
+                result = self.test_case(runner, input_string, False)
+                if result != "OK":
+                    return result
+
+            for input_string in random_inputs:
+                result = self.test_case(runner, input_string, False)
+                if result != "OK":
+                    return result
+
         except CompilationError as e:
             return f"Ошибка компиляции: {e}"
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
-
-
-if __name__ == "__main__":
-    test = QuestionStringOperations(seed=10, num_operations=3, min_length=50, max_length=60, strictness=0.0)
-    print(test.questionText)
-    print(test.input_string)
-    print(apply_operations(test.input_string.replace(" ", "  "), test.operations))
-
