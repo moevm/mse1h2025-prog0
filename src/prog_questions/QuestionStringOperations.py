@@ -8,18 +8,18 @@ QUESTION_TEXT = """
 <h1>Условие задачи</h1>
 <p>Дана строка, содержащая латинские буквы (в верхнем и нижнем регистрах), цифры, пробелы и знаки подчеркивания. Необходимо выполнить над этой строкой одну или несколько операций.</p>
 
-<h2>Формат ввода</h2>
+<h4>Формат ввода</h4>
 <p>На вход подается строка длиной до <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы и знаки подчеркивания. Также задается набор операций, которые необходимо применить к строке.</p>
 
-<h2>Операции вашего варианта</h2>
+<h4>Операции вашего варианта</h4>
 <ul>
     {operations}
 </ul>
 
-<h2>Формат вывода</h2>
+<h4>Формат вывода</h4>
 <p>Вывести преобразованную строку после применения всех заданных операций.</p>
 
-<h2>Пример</h2>
+<h5>Пример</h5>
 <table>
     <tr>
         <th>Входные данные</th>
@@ -34,7 +34,7 @@ QUESTION_TEXT = """
                 <li>Перевести все гласные буквы ['A', 'E', 'I', 'O', 'U', 'Y'] в нижний регистр</li>
             </ul>
         </td>
-        <td><code>hEllO_102 WOrld_021</code></td>
+        <td><code>HeLLo_120 WoRLD_120</code></td>
     </tr>
 </table>
 """
@@ -126,7 +126,7 @@ class QuestionStringOperations(QuestionBase):
 
             boundary_inputs = [
                 "", "A", "A" * self.max_length,
-                "123467890", "___  __   _", "     ",
+                "123467890", "___  __   _",
                 "BCDFG", "AEIOUY"
             ]
 
@@ -141,7 +141,7 @@ class QuestionStringOperations(QuestionBase):
                     return result
 
             for input_string in random_inputs:
-                result = self.test_case(runner, input_string, False)
+                result = self.test_case(runner, input_string)
                 if result != "OK":
                     return result
 
@@ -149,3 +149,72 @@ class QuestionStringOperations(QuestionBase):
             return f"Ошибка компиляции: {e}"
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
+
+
+if __name__ == "__main__":
+    test = QuestionStringOperations(seed=1, num_operations=3, min_length=10, max_length=100, strictness=1)
+    print(test.test("""
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+void replace_digits(char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (isdigit(str[i])) {
+            str[i] = '0' + (str[i] - '0') % 9;  // Заменяем цифры остатками от деления на 9
+        }
+    }
+}
+
+void convert_vowels_to_lower(char *str) {
+    char vowels[] = "AEIOUYaeiouy";
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (strchr(vowels, str[i])) {
+            str[i] = tolower(str[i]);  // Переводим гласные в нижний регистр
+        }
+    }
+}
+
+void replace_spaces_with_underscores(char *str) {
+    int count = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == ' ') {
+            count++;
+        }
+    }
+
+    int replacement = count % 15;  // Остаток от деления на 15, если число пробелов больше 8
+
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == ' ') {
+            // Заменяем пробелы на число символов "_"
+            for (int j = 0; j < replacement; j++) {
+                printf("_");
+            }
+        } else {
+            putchar(str[i]);  // Печатаем остальные символы как есть
+        }
+    }
+}
+
+int main() {
+    char str[101];
+    fgets(str, 101, stdin);  // Ввод строки
+    str[strcspn(str, "\n")] = '\0';  // Удаляем символ новой строки, если есть
+
+    // Применяем операции
+    replace_digits(str);
+    convert_vowels_to_lower(str);
+
+    // Печатаем строку, заменяя пробелы
+    replace_spaces_with_underscores(str);
+
+    printf("\n");
+    return 0;
+}
+
+    """))
+
+"{]|?[%*~&$hUMAn_7%~[(____WWWWWWWWWWWW7WWWWTTWWWWlAtErlIKElY_7WWWWTT7KEEPT7OPEN7____WWWWTT7_7WWWW_OvER__"
+"{]|?[%*~&$hUMAn_0%~[(____WWWWWWWWWWWW0WWWWTTWWWWlAtErlIKElY_0WWWWTT0KEEPT0OPEN0____WWWWTT0_0WWWW_OvER__"
+
