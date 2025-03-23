@@ -23,6 +23,20 @@ class QuestionRandomExpression(QuestionBase):
     def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=5,
                  minuses_threshold=0,
                  brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0):
+        """
+                Конструктор класса QuestionRandomExpression.
+
+                :param seed: Сид для генерации случайных данных
+                :param vars: Список переменных для генерации выражений (по умолчанию ['x','y','z','w'])
+                :param operations: Допустимые операции для выражений (по умолчанию ['+','-','*','&','|'])
+                :param length: Длина генерируемого выражения (по умолчанию 5)
+                :param minuses_threshold: Порог для использования унарных минусов (0-1, по умолчанию 0)
+                :param brackets_treshold: Порог для генерации скобок (0-1, по умолчанию 0)
+                :param minus_symbol: Символ для отображения минуса (по умолчанию "-")
+                :param all_variables: Флаг обязательного использования всех переменных (по умолчанию False)
+                :param strictness: Уровень строгости проверки (0-1, влияет на количество тестов)
+                :param space_amount: Количество пробелов между значениями ввода (по умолчанию 1)
+        """
         super().__init__(seed=seed, vars=vars, operations=operations, length=length,
                          minuses_threshold=minuses_threshold,
                          brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables, strictness=strictness)
