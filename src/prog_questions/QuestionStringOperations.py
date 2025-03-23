@@ -1,6 +1,6 @@
-from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
-from generators.string_operations import generate_operations, generate_input_string, apply_operations, generate_text
-from QuestionBase import QuestionBase
+from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from .generators.string_operations import generate_operations, generate_input_string, apply_operations, generate_text
+from .QuestionBase import QuestionBase
 from textwrap import dedent
 import random
 
