@@ -50,6 +50,13 @@ int main() {
 
 
 class QuestionStringOperations(QuestionBase):
+    """
+    :param seed: Seed для воспроизводимости тестов.
+    :param num_operations: количество операций задачи.
+    :param min_length: минимальная длина входных данных.
+    :param max_length: максимальная длина входных данных.
+    :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
+    """
     def __init__(self, *, seed: int, num_operations: int, min_length: int, max_length: int, strictness: float):
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness)
