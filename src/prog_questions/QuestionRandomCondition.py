@@ -1,8 +1,8 @@
-from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
 import random
 from textwrap import dedent
-from .generators.random_condition_loop import Task
-from .QuestionBase import QuestionBase
+from generators.random_condition_loop import Task
+from QuestionBase import QuestionBase
 
 PRELOADED_CODE = """\
 #include <stdio.h>
@@ -95,7 +95,7 @@ class QuestionRandomCondition(QuestionBase):
     def questionText(self) -> str:
         cleaned_text = dedent(BASE_TEXT)
         result = cleaned_text.format(
-            condition = self.task.text,
+            condition = ("<br>\n".join(self.task.text.split("\n"))),
             array_length = self.task.array_length
         )
 
