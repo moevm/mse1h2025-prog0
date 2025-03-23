@@ -2,6 +2,7 @@ import subprocess
 import os
 import tempfile
 from cProfile import runctx
+from select import select
 
 from .QuestionBase import QuestionBase
 from .generators.random_expressions import get_expression
@@ -52,7 +53,9 @@ class QuestionRandomExpression(QuestionBase):
         self.testing_vars = {key:value for key, value in zip(self.vars, self.testing_values)}
         self.testing_result = eval(self.questionExpression, self.testing_vars)
         self.strictness = strictness
-        self.space_amount = 1
+        self.min_tests = 20
+        self.max_tests = 50
+        self.space_amount = self.min_tests + self.strictness * (self.max_tests - self.min_tests)
 
     @property
     def questionName(self) -> str:
@@ -142,9 +145,8 @@ class QuestionRandomExpression(QuestionBase):
                     return f"Ошибка выполнения в тесте '{case['name']}': {str(e)}"
 
             # Случайные тесты (существующая логика)
-            min_tests = 20
-            max_tests = 50
-            tests_count = min_tests + self.strictness * (max_tests - min_tests)
+
+            tests_count = self.min_tests + self.strictness * (self.max_tests - self.min_tests)
             self.space_amount = tests_count
             random.seed(self.seed)
             for i in range(int(tests_count)):
