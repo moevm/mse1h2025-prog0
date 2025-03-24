@@ -70,7 +70,7 @@ int main() {
     }
 
     process_string(str);
-    printf("Результат: %s\n", str);
+    printf("%s\n", str);
 
     return 0;
 }
