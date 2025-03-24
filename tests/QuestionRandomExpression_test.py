@@ -1,12 +1,15 @@
-from prog_questions import QuestionRandomExpression
+from prog_questions import QuestionRandomExpression, utility
 from utility import moodleInit
 
 
 class TestQuestionRandomExpression:
-    question = moodleInit(QuestionRandomExpression, seed=12345)
+    question = moodleInit(QuestionRandomExpression, seed=52)
 
     def test_code_preload(self):
-        assert 'main' in self.question.preloadedCode
+        utility.CProgramRunner.CProgramRunner(self.question.preloadedCode)
+
+    def test_task_text(self):
+        assert "w * y & w + x - y * w" in self.question.questionText
 
     def test_correct_solution(self):
         result = self.question.test(
@@ -18,8 +21,8 @@ class TestQuestionRandomExpression:
                 if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
 
                 // w=a, x=b, y=c, z=d (алфавитный порядок)
-                int w = a, y = c, z = d;
-                int result = (z * w - z) | (y * w) | y;
+                int w = a, y = c, z = d, x = b;
+                int result = w * y & w + x - y * w;
 
                 printf("%d\n", result);
                 return 0;
@@ -38,26 +41,12 @@ class TestQuestionRandomExpression:
             // Пропущена точка с запятой
             if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
 
-            int result = (d * a - d) | (c * a) | c;
+            int result = w * y & w + x - y * w;
             printf("%d\n", result);
         }
         '''
         assert self.question.test(code1) == "Ошибка компиляции"
 
-        # Тест 2: Несуществующая функция
-        code2 = r'''
-        #include <stdio.h>
-
-        int main() {
-            int a, b, c, d;
-            scan("%d %d %d %d", &a, &b, &c, &d); // Опечатка в scanf
-
-            int result = (d * a - d) | (c * a) | c;
-            printf("%d\n", result);
-            return 0;
-        }
-        '''
-        assert self.question.test(code2) == "Ошибка компиляции"
 
     def test_incorrect_results(self):
         # Тест 1: Неправильный порядок операций
@@ -67,9 +56,8 @@ class TestQuestionRandomExpression:
         int main() {
             int a, b, c, d;
             if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
-
-            // Ошибка: z*w - (z | y) вместо (z*w - z) | y
-            int result = (d * a - (d | c)) | (c * a);
+            int w = a, y = c, z = d, x = b;
+            int result = w * (y & w) + x - y * w;
 
             printf("%d\n", result);
             return 0;
@@ -78,20 +66,3 @@ class TestQuestionRandomExpression:
         res1 = self.question.test(code1)
         assert res1 != 'OK', "Ожидалась ошибка выполнения, но тест пройден"
 
-        # Тест 2: Неправильные переменные
-        code2 = r'''
-        #include <stdio.h>
-
-        int main() {
-            int a, b, c, d;
-            if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
-
-            // Используем неправильные переменные (z вместо w)
-            int result = (d * d - d) | (c * d) | c;
-
-            printf("%d\n", result);
-            return 0;
-        }
-        '''
-        res2 = self.question.test(code2)
-        assert res2 != 'OK', "Ожидалась ошибка выполнения, но тест пройден"

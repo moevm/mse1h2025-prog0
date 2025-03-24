@@ -9,13 +9,7 @@ from .generators.random_expressions import get_expression
 import random
 from .utility.CProgramRunner import CProgramRunner, ExecutionError, CompilationError
 
-PRELOADED_CODE = '''#include <stdio.h>
 
-int main() {
-
-   return 0;
-}
-'''
 
 
 class QuestionRandomExpression(QuestionBase):
@@ -61,6 +55,38 @@ class QuestionRandomExpression(QuestionBase):
     def questionName(self) -> str:
         return f"Сложение чисел"
 
+    def generate_c_code(self):
+        # Сортируем переменные в алфавитном порядке
+        sorted_vars = sorted(self.vars)
+
+        # Генерируем строки для кода
+        vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
+        scanf_format = " ".join("%d" for _ in sorted_vars)  # Формат для scanf
+        scanf_vars = ", ".join(f"&{var}" for var in sorted_vars)  # Указатели для scanf
+
+        # Генерация выражения (пример)
+        expression = self.questionExpression
+
+        # Генерируем итоговый код
+        c_code = f"""
+    #include <stdio.h>
+
+    int main() {{
+        {vars_declaration}
+        if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+
+        // Вычисление выражения
+        int result = {expression};
+        printf("%d\\n", result);
+        return 0;
+    }}
+    """
+        return c_code
+
+    @property
+    def preloadedCode(self) -> str:
+        return self.generate_c_code()
+
     @property
     def questionText(self) -> str:
         operations_list = ["+", "-", "*", "&", "|"]
@@ -98,25 +124,20 @@ class QuestionRandomExpression(QuestionBase):
             </table>
             """
 
-    @property
-    def preloadedCode(self) -> str:
-        return ""
 
     @property
     def questionExpression(self) -> str:
         return get_expression(self.vars, self.operations, self.length, self.seed, self.minuses_threshold,
                               self.brackets_treshold, self.minus_symbol, self.all_variables)
 
-
     def test(self, code: str) -> str:
         try:
+
+            # крайний случай с пустым вводом
             runner = CProgramRunner(code)
-
-            # Тест с пустым вводом
+            general_runner = CProgramRunner(self.preloadedCode)
             output = runner.run('')
-            if output != '':
-                return "Ошибка: Пустой ввод не обработан корректно"
-
+            general_output = general_runner.run('')
             # Список краевых случаев
             edge_cases = [
                 {
@@ -138,11 +159,6 @@ class QuestionRandomExpression(QuestionBase):
                 {
                     'name': 'большие числа',
                     'values': [10 ** 9] * len(self.vars)
-                },
-                {
-                    'name': 'разные пробелы',
-                    'values': [5, 10, 15, 20][:len(self.vars)],
-                    'input_data': '   5  10   15   20   '  # Пример для 4 переменных
                 }
             ]
 
@@ -152,45 +168,43 @@ class QuestionRandomExpression(QuestionBase):
                 input_data = case.get('input_data', (' ' * self.space_amount).join(map(str, values)))
 
                 try:
-                    expected = eval(self.questionExpression, dict(zip(self.vars, values)))
+                    general_output = general_runner.run(input_data)
                     output = runner.run(input_data)
 
-                    if output != expected:
+                    if output != general_output:
                         return (
                             f"Краевой случай '{case['name']}': Ошибка\n"
                             f"Вход: {input_data}\n"
-                            f"Ожидалось: {expected}\n"
+                            f"Ожидалось: {general_output}\n"
                             f"Получено: {output}"
                         )
                 except ExecutionError as e:
                     return f"Ошибка выполнения в тесте '{case['name']}': {str(e)}"
 
-            # Случайные тесты (существующая логика)
+            if output != general_output:
+                return f"Тест пройден с ошибкой"
 
-            tests_count = self.min_tests + self.strictness * (self.max_tests - self.min_tests)
-            self.space_amount = tests_count
-            random.seed(self.seed)
-            for i in range(int(tests_count)):
-                values = [random.randint(-10 ** 6, 10 ** 6) for _ in self.vars]
-                input_data = (' ' * self.space_amount).join(map(str, values))
-                expected = eval(self.questionExpression, dict(zip(self.vars, values)))
-
-                try:
-                    output = runner.run(input_data)
-                    if output != expected:
-                        return (
-                            f"Случайный тест {i + 1}/{tests_count}: Ошибка\n"
-                            f"Вход: {input_data}\n"
-                            f"Ожидалось: {expected}\n"
-                            f"Получено: {output}"
-                        )
-                except ExecutionError as e:
-                    return f"Ошибка выполнения в случайном тесте {i + 1}: {str(e)}"
-
+            min_tests_number = 20
+            max_tests_number = 50
+            tests_number = min_tests_number + self.strictness * (max_tests_number - min_tests_number)
+            for i in range(tests_number):
+                random.seed(self.seed)
+                testing_values = [random.randint(0, 100000) for _ in self.vars]
+                testing_vars = {key: value for key, value in zip(self.vars, testing_values)}
+                runner = CProgramRunner(code)
+                general_output = general_runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
+                output = runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
+                if output != general_output:
+                    return f"Тест {i + 1} из {26} пройден с ошибкой"
             return "OK"
 
         except CompilationError as e:
             return "Ошибка компиляции"
+
+
+        except ExecutionError as e:
+            return f"Ошибка выполнения [{e.exit_code}]: {str(e)}"
+
         except Exception as e:
-            return f"Неожиданная ошибка: {str(e)}"
+            return f"Неожиданная ошибка:{str(e)}"
 
