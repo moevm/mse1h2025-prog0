@@ -108,7 +108,7 @@ for file in target_files:
         keywords = []
 
     # Создание куска кода с вызовом initTemplate со стандартными параметрами (полученными из кода конструктора)
-    call_node = ast.Call(func=ast.Attribute(value=ast.Name(id=question_class), attr='initTemplate'), keywords=keywords)
+    call_node = ast.Call(func=ast.Attribute(value=ast.Name(id=question_class), attr='initTemplate'), args=[], keywords=keywords)
     constructor_code = astor.to_source(call_node).rstrip()
 
     # Подстановка в шаблоны кода
