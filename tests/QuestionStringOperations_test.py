@@ -16,70 +16,71 @@ class TestQuestionRandomCondition:
     def test_code_success_run(self):
         assert self.question.test(
             r'''
-    #include <stdio.h>
-    #include <string.h>
-    #include <ctype.h>
-    #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 
-    int is_vowel(char c) {
-        c = toupper(c);
-        return (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y');
+int is_vowel(char c) {
+    c = toupper(c);
+    return (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y');
+}
+
+void replace_spaces_with_count(char *str) {
+    int underscore_count = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == '_') underscore_count++;
     }
 
-    void replace_spaces(char *str) {
-        int underscore_count = 0;
-        for (int i = 0; str[i] != '\0'; i++) {
-            if (str[i] == '_') underscore_count++;
-        }
+    int replace_value = underscore_count;
+    if (underscore_count > 7) replace_value = underscore_count % 13;
 
-        int replace_value = underscore_count;
-        if (underscore_count > 7) replace_value = underscore_count % 13;
+    char *new_str = (char *)malloc(1000 * sizeof(char));
+    int new_index = 0;
 
-        char *new_str = (char *)malloc(1000 * sizeof(char));
-        int new_index = 0;
-
-        for (int i = 0; str[i] != '\0'; i++) {
-            if (str[i] == ' ') {
-                for (int j = 0; j < replace_value; j++) {
-                    new_str[new_index++] = '_';
-                }
-            } else {
-                new_str[new_index++] = str[i];
-            }
-        }
-        new_str[new_index] = '\0';
-
-        strcpy(str, new_str);
-        free(new_str);
-    }
-
-    void replace_digits(char *str) {
-        for (int i = 0; str[i] != '\0'; i++) {
-            if (isdigit(str[i])) {
-                int digit = str[i] - '0';
-                str[i] = (digit % 2) + '0';
-            }
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == ' ') {
+            char num_str[10];
+            sprintf(num_str, "%d", replace_value);
+            strcpy(&new_str[new_index], num_str);
+            new_index += strlen(num_str);
+        } else {
+            new_str[new_index++] = str[i];
         }
     }
+    new_str[new_index] = '\0';
 
-    int main() {
-        char str[101];
-        fgets(str, sizeof(str), stdin);
-        str[strcspn(str, "\n")] = '\0';
+    strcpy(str, new_str);
+    free(new_str);
+}
 
-        for (int i = 0; str[i] != '\0'; i++) {
-            if (is_vowel(str[i])) {
-                str[i] = toupper(str[i]);
-            }
+void replace_digits(char *str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (isdigit(str[i])) {
+            int digit = str[i] - '0';
+            str[i] = (digit % 2) + '0';
         }
-
-        replace_spaces(str);
-
-        replace_digits(str);
-        printf("%s\n", str);
-
-        return 0;
     }
+}
+
+int main() {
+    char str[101];
+    fgets(str, sizeof(str), stdin);
+    str[strcspn(str, "\n")] = '\0';
+
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (is_vowel(str[i])) {
+            str[i] = toupper(str[i]);
+        }
+    }
+
+    replace_spaces_with_count(str);
+
+    replace_digits(str);
+    printf("%s\n", str);
+
+    return 0;
+}
             '''
         ) == 'OK'
 
