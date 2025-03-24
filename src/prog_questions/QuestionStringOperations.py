@@ -52,7 +52,7 @@ class QuestionStringOperations(QuestionBase):
     :param max_length: максимальная длина входных данных.
     :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
     """
-    def __init__(self, *, seed: int, num_operations: int, min_length: int, max_length: int, strictness: float):
+    def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1):
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness)
         self.strictness = strictness
