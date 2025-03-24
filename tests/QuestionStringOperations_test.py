@@ -16,7 +16,7 @@ class TestQuestionRandomCondition:
     def test_code_success_run(self):
         assert self.question.test(
             r'''
-#include <stdio.h>
+            #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -61,6 +61,7 @@ int main() {
             temp[temp_index++] = str[i];
         }
     }
+
     temp[temp_index] = '\0';
 
     strcpy(str, temp);
