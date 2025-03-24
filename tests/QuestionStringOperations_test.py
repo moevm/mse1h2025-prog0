@@ -64,7 +64,7 @@ void replace_digits(char *str) {
 }
 
 int main() {
-    char str[101];
+    char str[200];
     fgets(str, sizeof(str), stdin);
     str[strcspn(str, "\n")] = '\0';
 
