@@ -20,10 +20,17 @@ class TestQuestionRandomCondition:
 #include <string.h>
 #include <ctype.h>
 
-void process_string(char *str) {
-    char vowels[] = "AEIOUYaeiouy";
+int is_vowel(char c) {
+    c = toupper(c);
+    return (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y');
+}
+
+int main() {
+    char str[1000];
+    fgets(str, sizeof(str), stdin);
+    str[strcspn(str, "\n")] = '\0';
     for (int i = 0; str[i] != '\0'; i++) {
-        if (strchr(vowels, str[i]) != NULL) {
+        if (is_vowel(str[i])) {
             str[i] = toupper(str[i]);
         }
     }
@@ -34,42 +41,24 @@ void process_string(char *str) {
             underscore_count++;
         }
     }
-    int replace_num = underscore_count;
-    if (replace_num > 7) {
-        replace_num %= 13;
+
+    int N = underscore_count;
+    if (N > 7) {
+        N = N % 13;
     }
 
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == ' ') {
-            char temp[210] = {0};
-            sprintf(temp, "%d", replace_num);
-
-            int num_len = strlen(temp);
-            int str_len = strlen(str);
-
-            memmove(&str[i + num_len], &str[i + 1], str_len - i);
-            memcpy(&str[i], temp, num_len);
-            i += num_len - 1;
+            str[i] = '0' + N;
         }
     }
+
     for (int i = 0; str[i] != '\0'; i++) {
         if (isdigit(str[i])) {
             int digit = str[i] - '0';
-            str[i] = (digit % 2) + '0';
+            str[i] = '0' + (digit % 2);
         }
     }
-}
-
-int main() {
-    char str[210];
-    fgets(str, sizeof(str), stdin);
-
-    size_t len = strlen(str);
-    if (len > 0 && str[len - 1] == '\n') {
-        str[len - 1] = '\0';
-    }
-
-    process_string(str);
     printf("%s\n", str);
 
     return 0;
