@@ -19,42 +19,39 @@ class TestQuestionRandomCondition:
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdlib.h>
 
-int is_vowel(char c) {
-    c = toupper(c);
-    return (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y');
-}
-
-void replace_spaces_with_count(char *str) {
-    int underscore_count = 0;
+void process_string(char *str) {
+    char vowels[] = "AEIOUYaeiouy";
     for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == '_') underscore_count++;
+        if (strchr(vowels, str[i]) != NULL) {
+            str[i] = toupper(str[i]);
+        }
     }
 
-    int replace_value = underscore_count;
-    if (underscore_count > 7) replace_value = underscore_count % 13;
-
-    char *new_str = (char *)malloc(1000 * sizeof(char));
-    int new_index = 0;
+    int underscore_count = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (str[i] == '_') {
+            underscore_count++;
+        }
+    }
+    int replace_num = underscore_count;
+    if (replace_num > 7) {
+        replace_num %= 13;
+    }
 
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == ' ') {
-            char num_str[10];
-            sprintf(num_str, "%d", replace_value);
-            strcpy(&new_str[new_index], num_str);
-            new_index += strlen(num_str);
-        } else {
-            new_str[new_index++] = str[i];
+            char temp[210] = {0};
+            sprintf(temp, "%d", replace_num);
+
+            int num_len = strlen(temp);
+            int str_len = strlen(str);
+
+            memmove(&str[i + num_len], &str[i + 1], str_len - i);
+            memcpy(&str[i], temp, num_len);
+            i += num_len - 1;
         }
     }
-    new_str[new_index] = '\0';
-
-    strcpy(str, new_str);
-    free(new_str);
-}
-
-void replace_digits(char *str) {
     for (int i = 0; str[i] != '\0'; i++) {
         if (isdigit(str[i])) {
             int digit = str[i] - '0';
@@ -64,20 +61,16 @@ void replace_digits(char *str) {
 }
 
 int main() {
-    char str[200];
+    char str[210];
     fgets(str, sizeof(str), stdin);
-    str[strcspn(str, "\n")] = '\0';
 
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (is_vowel(str[i])) {
-            str[i] = toupper(str[i]);
-        }
+    size_t len = strlen(str);
+    if (len > 0 && str[len - 1] == '\n') {
+        str[len - 1] = '\0';
     }
 
-    replace_spaces_with_count(str);
-
-    replace_digits(str);
-    printf("%s\n", str);
+    process_string(str);
+    printf("Результат: %s\n", str);
 
     return 0;
 }
