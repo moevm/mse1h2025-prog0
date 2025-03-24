@@ -1,11 +1,4 @@
-import subprocess
-import os
-import tempfile
-from cProfile import runctx
-from select import select
-
 from .QuestionBase import QuestionBase
-from .QuestionSum import PRELOADED_CODE
 from .generators.random_expressions import get_expression
 import random
 from .utility.CProgramRunner import CProgramRunner, ExecutionError, CompilationError
@@ -192,15 +185,12 @@ class QuestionRandomExpression(QuestionBase):
             min_tests_number = 20
             max_tests_number = 50
             tests_number = min_tests_number + self.strictness * (max_tests_number - min_tests_number)
+            random.seed(self.seed)
             for i in range(tests_number):
-                random.seed(self.seed)
-                testing_values = [random.randint(0, 100000) for _ in self.vars]
-                testing_vars = {key: value for key, value in zip(self.vars, testing_values)}
-                runner = CProgramRunner(code)
                 general_output = general_runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
                 output = runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
                 if output != general_output:
-                    return f"Тест {i + 1} из {26} пройден с ошибкой"
+                    return f"Тест {i + 1} из {tests_number} пройден с ошибкой. Ожидалось: {general_output}, Ваш ответ: {output}"
             return "OK"
 
         except CompilationError as e:
