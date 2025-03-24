@@ -5,11 +5,16 @@ from cProfile import runctx
 from select import select
 
 from .QuestionBase import QuestionBase
+from .QuestionSum import PRELOADED_CODE
 from .generators.random_expressions import get_expression
 import random
 from .utility.CProgramRunner import CProgramRunner, ExecutionError, CompilationError
 
+PRELOADED_CODE = '''#include <stdio.h>
 
+int main() {
+    return 0;
+}'''
 
 
 class QuestionRandomExpression(QuestionBase):
@@ -85,7 +90,7 @@ class QuestionRandomExpression(QuestionBase):
 
     @property
     def preloadedCode(self) -> str:
-        return self.generate_c_code()
+        return PRELOADED_CODE
 
     @property
     def questionText(self) -> str:
@@ -135,7 +140,7 @@ class QuestionRandomExpression(QuestionBase):
 
             # крайний случай с пустым вводом
             runner = CProgramRunner(code)
-            general_runner = CProgramRunner(self.preloadedCode)
+            general_runner = CProgramRunner(self.generate_c_code())
             output = runner.run('')
             general_output = general_runner.run('')
             # Список краевых случаев
