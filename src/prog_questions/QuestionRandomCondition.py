@@ -22,7 +22,7 @@ BASE_TEXT = """\
     <br><br>
     Для нулевого элемента массива принять <b>arr[i - 1] = 0</b>
     <br><br>
-    На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелом. Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
+    На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелами (не обязательно одним). Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.
     <br><br>
     Пример работы программы:
     <br>
@@ -35,8 +35,8 @@ BASE_TEXT = """\
         </thead>
         <tbody>
             <tr>
-                <td>35 7 93 66 62 48 53 5 18 21</td>
-                <td>51 23 77 82 46 32 37 21 2 5</td>
+                <td>{input}</td>
+                <td>{output}</td>
             </tr>
         </tbody>
     </table>
@@ -83,9 +83,19 @@ class QuestionRandomCondition(QuestionBase):
     def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1):
         super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness)
         self.task = Task(array_length, condition_length, seed)
-        self.sample_code = self.task.code
         self.parse(self.task.text)
         self.seed = seed
+        self.example_solution = EXAMPLE_CODE.format(
+            array_length=self.task.array_length,
+            condition_string=self.condtition_string,
+            condition_operator=self.condition_operator,
+            threshold=self.task.threshold,
+            then_number=self.task.then_number,
+            else_number=self.task.else_number,
+            then_operator=self.then_operator,
+            else_operator=self.else_operator
+        )
+        self.expected_output_runner = CProgramRunner(self.example_solution)
 
     @property
     def questionName(self) -> str:
@@ -94,9 +104,17 @@ class QuestionRandomCondition(QuestionBase):
     @property
     def questionText(self) -> str:
         cleaned_text = dedent(BASE_TEXT)
+
+        input_arr = [random.randint(1, 500) for _ in range(self.parameters['array_length'])]
+        input = " ".join(map(str, input_arr))
+
+        output = self.expected_output_runner.run(input)
+
         result = cleaned_text.format(
-            condition = self.task.text,
-            array_length = self.task.array_length
+            condition = ("<br>\n".join(self.task.text.split("\n"))),
+            array_length = self.task.array_length,
+            input = input,
+            output = output
         )
 
         return result
@@ -119,19 +137,7 @@ class QuestionRandomCondition(QuestionBase):
         separator = " " * space_amount
         input = separator.join(map(str, arr))
 
-        example_solution = EXAMPLE_CODE.format(
-            array_length=self.task.array_length,
-            condition_string=self.condtition_string,
-            condition_operator=self.condition_operator,
-            threshold=self.task.threshold,
-            then_number=self.task.then_number,
-            else_number=self.task.else_number,
-            then_operator=self.then_operator,
-            else_operator=self.else_operator
-        )
-
-        expected_output_runner = CProgramRunner(example_solution)
-        expected_output = expected_output_runner.run(input)
+        expected_output = self.expected_output_runner.run(input)
 
         try:
             runner = CProgramRunner(code)
