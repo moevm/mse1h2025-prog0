@@ -26,7 +26,7 @@ int is_vowel(char c) {
 }
 
 int main() {
-    char str[1000];
+    char str[2000];
     fgets(str, sizeof(str), stdin);
     str[strcspn(str, "\n")] = '\0';
     for (int i = 0; str[i] != '\0'; i++) {
@@ -47,11 +47,23 @@ int main() {
         N = N % 13;
     }
 
+    char temp[2000] = "";
+    int temp_index = 0;
+
     for (int i = 0; str[i] != '\0'; i++) {
         if (str[i] == ' ') {
-            str[i] = '0' + N;
+            char num_str[3];
+            sprintf(num_str, "%d", N);
+            for (int j = 0; num_str[j] != '\0'; j++) {
+                temp[temp_index++] = num_str[j];
+            }
+        } else {
+            temp[temp_index++] = str[i];
         }
     }
+    temp[temp_index] = '\0';
+
+    strcpy(str, temp);
 
     for (int i = 0; str[i] != '\0'; i++) {
         if (isdigit(str[i])) {
