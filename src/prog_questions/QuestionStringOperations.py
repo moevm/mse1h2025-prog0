@@ -8,7 +8,7 @@ QUESTION_TEXT = """
 <h1>Условие задачи</h1>
 <p>Дана строка, содержащая латинские буквы (в верхнем и нижнем регистрах), цифры, пробелы и знаки подчеркивания. Необходимо выполнить над этой строкой одну или несколько операций.</p>
 <h4>Формат ввода</h4>
-<p>На вход подается строка по длине не превосходящая <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы, специальные символы (!@#$%^&*()[]{}/?|~) и знаки подчеркивания.</p>
+<p>На вход подается строка по длине не превосходящая <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы, специальные символы (!@#$%^&*()[]{{}}/?|~) и знаки подчеркивания.</p>
 
 <h4>Операции вашего варианта</h4>
 <ul>
@@ -52,7 +52,7 @@ class QuestionStringOperations(QuestionBase):
     :param max_length: максимальная длина входных данных.
     :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
     """
-    def __init__(self, *, seed: int, num_operations: int, min_length: int, max_length: int, strictness: float):
+    def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1):
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness)
         self.strictness = strictness
@@ -145,3 +145,4 @@ class QuestionStringOperations(QuestionBase):
             return f"Ошибка компиляции: {e}"
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
+
