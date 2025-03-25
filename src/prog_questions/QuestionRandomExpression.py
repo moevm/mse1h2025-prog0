@@ -11,7 +11,10 @@ int main() {
 
 
 class QuestionRandomExpression(QuestionBase):
-    """Демонстрационный класс, реализующий задачу сложения чисел"""
+    questionName = "Сложение чисел"
+    '''
+    Название вопроса
+    '''
 
     def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=5,
                  minuses_threshold=0,
@@ -48,10 +51,6 @@ class QuestionRandomExpression(QuestionBase):
         self.min_space_number = 1
         self.max_space_number = 15
         self.space_amount = self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number)
-
-    @property
-    def questionName(self) -> str:
-        return f"Сложение чисел"
 
     def generate_c_code(self):
         # Сортируем переменные в алфавитном порядке
