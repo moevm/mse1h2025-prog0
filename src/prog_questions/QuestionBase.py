@@ -4,6 +4,11 @@ import json
 
 
 class QuestionBase(ABC):
+    questionName: str = ''
+    '''
+    Название вопроса
+    '''
+
     def __init__(self, *, seed: int, **parameters):
         self.seed = seed
         self.parameters = parameters
@@ -34,20 +39,11 @@ class QuestionBase(ABC):
         Возвращает параметры в формате JSON для шаблонизатора Twig
         '''
         return json.dumps({
-            'QUESTION_NAME': self.questionName,
             'QUESTION_TEXT': self.questionText,
             'PRELOADED_CODE': self.preloadedCode,
             'SEED': self.seed,
             'PARAMETERS': json.dumps(self.parameters | { 'seed': self.seed }),
         })
-
-    @property
-    @abstractmethod
-    def questionName(self) -> str:
-        '''
-        Название вопроса
-        '''
-        ...
 
     @property
     @abstractmethod

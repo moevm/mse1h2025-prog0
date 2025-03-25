@@ -45,24 +45,22 @@ int main() {
 
 
 class QuestionStringOperations(QuestionBase):
-    """
-    :param seed: Seed для воспроизводимости тестов.
-    :param num_operations: количество операций задачи.
-    :param min_length: минимальная длина входных данных.
-    :param max_length: максимальная длина входных данных.
-    :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
-    """
+    questionName = 'Операции над строками'
+
     def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1):
+        """
+        :param seed: Seed для воспроизводимости тестов.
+        :param num_operations: количество операций задачи.
+        :param min_length: минимальная длина входных данных.
+        :param max_length: максимальная длина входных данных.
+        :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
+        """
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness)
         self.strictness = strictness
         self.operations = generate_operations(seed, num_operations)
         self.min_length = min_length
         self.max_length = max_length
-
-    @property
-    def questionName(self) -> str:
-        return "Операции над строками"
 
     @property
     def questionText(self) -> str:
@@ -80,7 +78,7 @@ class QuestionStringOperations(QuestionBase):
         if self.strictness == 0.0 or len(input_string) >= self.max_length:
             return input_string
 
-        noise_chars = "!@#$%^&*()[]{}/?|~ "
+        noise_chars = "!@#$%^&*()[]{}/?|~"
         noise_level = int(self.strictness * 10)
 
         words = input_string.split(" ")

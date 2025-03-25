@@ -73,14 +73,15 @@ int main() {{
 """
 
 class QuestionRandomCondition(QuestionBase):
+    questionName = "Случайное условие"
 
-    """
-    :param seed: Seed для воспроизводимости тестов.
-    :param condition_length: Длина условия задачи.
-    :param array_length: Длина массива данных.
-    :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
-    """
     def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1):
+        """
+        :param seed: Seed для воспроизводимости тестов.
+        :param condition_length: Длина условия задачи.
+        :param array_length: Длина массива данных.
+        :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
+        """
         super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness)
         self.task = Task(array_length, condition_length, seed)
         self.parse(self.task.text)
@@ -96,10 +97,6 @@ class QuestionRandomCondition(QuestionBase):
             else_operator=self.else_operator
         )
         self.expected_output_runner = CProgramRunner(self.example_solution)
-
-    @property
-    def questionName(self) -> str:
-        return "Случайное условие"
 
     @property
     def questionText(self) -> str:
