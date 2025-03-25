@@ -96,7 +96,7 @@ class PrintSeedQuestion(QuestionBase):
 
 ### Методы класса:
 
-- `__init__(self, *, seed: int, condition_length: int, array_length: int, strictness: float)` - метод инициализации 
+- `__init__(self, *, seed: int, condition_length: int, array_length: int, strictness: float)` - метод инициализации
 
 * `seed` - случайное зерно, используемое для воспроизводимости результатов псевдослучайной генерации случайных значений;
 * `condition_length` - целое число, указывающее длину условия (количество операндов в генерируемом условии);
@@ -209,44 +209,16 @@ class PrintSeedQuestion(QuestionBase):
 ### Свойства класса
 
 - `preloadedCode: str`
-Код, который подгружается в поле редактирования кода. По умолчанию:
-
-```commandline
-#include <stdio.h>
-
-int main() {
-return 0;
-}
-```
-
+Код, который подгружается в поле редактирования кода.
 
 - `questionText: str`
 Текст задания. Генерируется автоматически и включает:
-- Условие задачи.
-- Формат ввода и вывода.
-- Пример входных и выходных данных.
+    - Условие задачи.
+    - Формат ввода и вывода.
+    - Пример входных и выходных данных.
 
 - `questionExpression: str`
 Генерируемое выражение для задачи. Использует заданные переменные, операции и параметры генерации.
-
-### Пример использования
-
-```commandline
-question = QuestionRandomExpression(
-seed=123,
-vars=['a', 'b', 'c'],
-operations=['+', '-'],
-length=3,
-minuses_threshold=0.2,
-brackets_treshold=0.1,
-strictness=0.5
-)
-
-print(question.questionText)
-print(question.generate_c_code())
-result = question.test(code="ваш_код_на_C")
-print(result)
-```
 
 
 ## Класс `QuestionStringOperations`
