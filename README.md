@@ -277,7 +277,7 @@ return 0;
 ### `questionExpression: str`
 Генерируемое выражение для задачи. Использует заданные переменные, операции и параметры генерации.
 
-## Пример использования
+### Пример использования
 
 ```commandline
 question = QuestionRandomExpression(
