@@ -51,18 +51,31 @@ with XML_TEMPLATE_PATH.open('r', encoding='utf-8') as xml_file:
 xml_template.xpath('//file')[0].text = bundle_base64
 
 
-# Класс извлечения узла аргументов из конструктора класса
-class InitArgumentsExtractor(ast.NodeVisitor):
+# Класс извлечения узла аргументов из конструктора класса и именя вопроса
+class InternalQuestionDataExtractor(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         if node.name != '__init__':
             return
 
         self.arguments_node = node.args
 
+    def visit_Assign(self, node):
+        if len(node.targets) < 1 or not isinstance(node.targets[0], ast.Name) or node.targets[0].id != 'questionName' or not isinstance(node.value, ast.Constant):
+            return
+
+        self.question_name = node.value.value
+
+    def visit_AnnAssign(self, node):
+        if not isinstance(node.target, ast.Name) or node.target.id != 'questionName' or not isinstance(node.value, ast.Constant):
+            return
+
+        self.question_name = node.value.value
+
     def extract(self, node: ast.AST) -> ast.arguments | None:
         self.arguments_node = None
+        self.question_name = None
         self.visit(node)
-        return self.arguments_node
+        return self.arguments_node, self.question_name
 
 # Класс извлечения названия класса и узла аргументов конструктора класса для потомков QuestionBase
 class QuestionDataExtractor(ast.NodeVisitor):
@@ -72,14 +85,15 @@ class QuestionDataExtractor(ast.NodeVisitor):
 
         self.class_name = node.name
 
-        arguments_extractor = InitArgumentsExtractor()
-        self.arguments_node = arguments_extractor.extract(node)
+        arguments_extractor = InternalQuestionDataExtractor()
+        self.arguments_node, self.question_name = arguments_extractor.extract(node)
 
     def extract(self, node: ast.AST) -> tuple[str | None, ast.arguments | None]:
         self.class_name = None
         self.arguments_node = None
+        self.question_name = None
         self.visit(node)
-        return self.class_name, self.arguments_node
+        return self.class_name, self.arguments_node, self.question_name
 
 
 # Шаблоны кода, внедряемого в xml-файл
@@ -103,7 +117,7 @@ print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
 # Проверка для всех файлов проекта
 for file in sources:
     # Получение информации о классе вопроса из файла
-    question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(file.read_text(encoding='utf-8')))
+    question_class, question_arguments, question_name = QuestionDataExtractor().extract(ast.parse(file.read_text(encoding='utf-8')))
 
     # Если в файле нет класса вопроса - пропускаем
     if question_class is None:
@@ -129,7 +143,7 @@ for file in sources:
     code = code_template.format(class_name=question_class).lstrip()
 
     # Модификация xml-шаблона
-    xml_template.xpath('//question/name/text')[0].text = question_class
+    xml_template.xpath('//question/name/text')[0].text = xml.CDATA(question_name)
     xml_template.xpath('//templateparams')[0].text = xml.CDATA(parameters_code)
     xml_template.xpath('//template')[0].text = xml.CDATA(code)
 
