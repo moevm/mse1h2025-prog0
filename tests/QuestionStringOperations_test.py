@@ -17,65 +17,49 @@ class TestQuestionRandomCondition:
         assert self.question.test(
             r'''
             #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
+            #include <string.h>
 
-int is_vowel(char c) {
-    c = toupper(c);
-    return (c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y');
-}
+            int main() {
+                char input[1024] = { 0 };
+                fgets(input, sizeof(input), stdin);
 
-int main() {
-    char str[2000];
-    fgets(str, sizeof(str), stdin);
-    str[strcspn(str, "\n")] = '\0';
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (is_vowel(str[i])) {
-            str[i] = toupper(str[i]);
-        }
-    }
+                char* symbol = input;
+                while (*symbol) {
+                    if (strchr("aeiouy", *symbol)) *symbol -= 'a' - 'A';
+                    symbol++;
+                }
 
-    int underscore_count = 0;
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == '_') {
-            underscore_count++;
-        }
-    }
+                size_t underscore_count = 0;
+                symbol = input;
+                while (*symbol) {
+                    if (*symbol == '_') underscore_count++;
+                    symbol++;
+                }
 
-    int N = underscore_count;
-    if (N > 7) {
-        N = N % 13;
-    }
+                if (underscore_count > 7) underscore_count %= 13;
+                char target_number[5] = { 0 };
+                snprintf(target_number, sizeof(target_number), "%zu", underscore_count);
 
-    char temp[2000] = "";
-    int temp_index = 0;
+                symbol = input;
+                while (*symbol) {
+                    if (*symbol == ' ') {
+                        memmove(symbol + strlen(target_number), symbol + 1, strlen(symbol + 1));
+                        strncpy(symbol, target_number, strlen(target_number));
+                        symbol += strlen(target_number) - 1;
+                    }
+                    symbol++;
+                }
 
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (str[i] == ' ') {
-            char num_str[3];
-            sprintf(num_str, "%d", N);
-            for (int j = 0; num_str[j] != '\0'; j++) {
-                temp[temp_index++] = num_str[j];
+                symbol = input;
+                while (*symbol) {
+                    if (strchr("0123456789", *symbol)) *symbol = ((*symbol - '0') % 2) + '0';
+                    symbol++;
+                }
+
+                puts(input);
+
+                return 0;
             }
-        } else {
-            temp[temp_index++] = str[i];
-        }
-    }
-
-    temp[temp_index] = '\0';
-
-    strcpy(str, temp);
-
-    for (int i = 0; str[i] != '\0'; i++) {
-        if (isdigit(str[i])) {
-            int digit = str[i] - '0';
-            str[i] = '0' + (digit % 2);
-        }
-    }
-    printf("%s\n", str);
-
-    return 0;
-}
             '''
         ) == 'OK'
 
