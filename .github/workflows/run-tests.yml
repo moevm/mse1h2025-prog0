@@ -1,0 +1,70 @@
+name: Testing and building the project
+on:
+  push:
+    branches: main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  test:
+    name: Test project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Install python modules
+        run: pip install -r requirements.txt
+
+      - name: Run pytest with coverage report
+        run: pytest --cov src/prog_questions --cov-report term-missing
+
+      - name: Send failure message to PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Тесты не прошли. Пожалуйста, проверьте логи и исправьте ошибки.'
+            })
+
+  build:
+    name: Build project
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Install python modules
+        run: pip install -r requirements.txt
+
+      - name: Build project into xml
+        run: python build/build.py
+
+      - name: List all built xml files
+        run: |
+          for file in dist/*; do
+            [ -f "$file" ] || continue
+            echo "File: $file"
+            cat "$file"
+            echo
+          done
+
+      - name: Send failure message to PR
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Сборка не прошла. Пожалуйста, проверьте логи и исправьте ошибки.'
+            })
