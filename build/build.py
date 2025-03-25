@@ -1,4 +1,5 @@
-import glob
+from pathlib import Path
+import shutil
 import tempfile
 import zipfile
 import base64
@@ -6,41 +7,48 @@ import os
 import lxml.etree as xml
 import ast
 import astor
-import pathlib
 
-SOURCE_DIR = 'src'
-OUTPUT_DIR = 'dist'
-XML_TEMPLATE_PATH = 'build/template.xml'
+
+# Константы
+ROOT = Path(__file__).resolve().parent.parent
+SOURCE_PATH = ROOT / 'src'
+OUTPUT_PATH = ROOT / 'dist'
+XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
+
+
+# Очистка папки вывода
+if OUTPUT_PATH.exists():
+    for file in OUTPUT_PATH.iterdir():
+        if file.is_dir():
+            shutil.rmtree(file)
+        else:
+            file.unlink()
+else:
+    OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
+
 
 # Получение base64 от zip-архива всех файлов проекта
-target_files = glob.glob('**/*.py', root_dir=SOURCE_DIR, recursive=True)
+sources = [*SOURCE_PATH.glob('**/*.py')]
 
-tempfile = tempfile.NamedTemporaryFile(delete=False)
+bundle_tempfile = tempfile.NamedTemporaryFile(delete=False)
 
-with zipfile.ZipFile(tempfile.name, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-    for file in target_files:
-        zip_file.write(os.path.join(SOURCE_DIR, file), file)
+with zipfile.ZipFile(bundle_tempfile.name, 'w', zipfile.ZIP_DEFLATED) as bundle_file:
+    for file in sources:
+        bundle_file.write(file, file.relative_to(SOURCE_PATH))
 
-with open(tempfile.name, 'rb') as f:
-    zip_base64 = base64.b64encode(f.read()).decode('ascii')
+with open(bundle_tempfile.name, 'rb') as f:
+    bundle_base64 = base64.b64encode(f.read()).decode('ascii')
 
-tempfile.close()
-os.unlink(tempfile.name)
+bundle_tempfile.close()
+os.unlink(bundle_tempfile.name)
 
 
 # Загрузка xml-шаблона вопроса и создание записи об zip-архиве
-file_xml_element = xml.Element('file',
-    name='prog_questions.zip',
-    path='/',
-    encoding='base64',
-)
-file_xml_element.text = zip_base64
-
-with open(XML_TEMPLATE_PATH, 'r') as xml_file:
+with XML_TEMPLATE_PATH.open('r', encoding='utf-8') as xml_file:
     xml_parser = xml.XMLParser(strip_cdata=False)
     xml_template = xml.parse(xml_file, xml_parser)
 
-xml_template.xpath('//testcases')[0].append(file_xml_element)
+xml_template.xpath('//file')[0].text = bundle_base64
 
 
 # Класс извлечения узла аргументов из конструктора класса
@@ -76,7 +84,7 @@ class QuestionDataExtractor(ast.NodeVisitor):
 
 # Шаблоны кода, внедряемого в xml-файл
 parameters_code_template = r'''import sys
-sys.path.insert(0, 'prog_questions.zip')
+sys.path.insert(0, 'bundle.zip')
 from prog_questions import {class_name}
 
 question = {constructor_code}
@@ -84,28 +92,33 @@ print(question.getTemplateParameters())
 '''
 
 code_template = r'''import sys
-sys.path.insert(0, 'prog_questions.zip')
+sys.path.insert(0, 'bundle.zip')
 from prog_questions import {class_name}
 
 question = {class_name}.initWithParameters("""{{{{ PARAMETERS | e('py') }}}}""")
 print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
 '''
 
+
 # Проверка для всех файлов проекта
-for file in target_files:
+for file in sources:
     # Получение информации о классе вопроса из файла
-    with open(os.path.join(SOURCE_DIR, file), 'r') as code_file:
-        question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(code_file.read()))
+    question_class, question_arguments = QuestionDataExtractor().extract(ast.parse(file.read_text(encoding='utf-8')))
 
     # Если в файле нет класса вопроса - пропускаем
     if question_class is None:
         continue
 
     # Конвертация узла arguments в массив keyword
+    keywords = []
+
     if question_arguments is not None:
-        keywords = [ast.keyword(arg=kw_name, value=kw_value) for kw_name, kw_value in zip(question_arguments.kwonlyargs, question_arguments.kw_defaults) if kw_name.arg != 'seed']
-    else:
-        keywords = []
+        for kw_name, kw_value in zip(question_arguments.kwonlyargs, question_arguments.kw_defaults):
+            if kw_name.arg == 'seed':
+                continue
+
+            kw_name.annotation = None
+            keywords.append(ast.keyword(arg=kw_name, value=kw_value))
 
     # Создание куска кода с вызовом initTemplate со стандартными параметрами (полученными из кода конструктора)
     call_node = ast.Call(func=ast.Attribute(value=ast.Name(id=question_class), attr='initTemplate'), args=[], keywords=keywords)
@@ -120,10 +133,7 @@ for file in target_files:
     xml_template.xpath('//templateparams')[0].text = xml.CDATA(parameters_code)
     xml_template.xpath('//template')[0].text = xml.CDATA(code)
 
-    # Создание директорий для выходного файла, если их нет
-    xml_filename = os.path.join(OUTPUT_DIR, f'{question_class}.xml')
-    pathlib.Path(os.path.dirname(xml_filename)).mkdir(parents=True, exist_ok=True)
-
     # Запись в файл и вывод в консоль
-    xml_template.write(xml_filename, xml_declaration=True, encoding='UTF-8')
-    print(xml_filename)
+    xml_output_path = OUTPUT_PATH / f'{question_class}.xml'
+    xml_template.write(xml_output_path, xml_declaration=True, encoding='utf-8')
+    print(xml_output_path)

@@ -6,7 +6,7 @@ class TestQuestionRandomCondition:
     question = moodleInit(QuestionStringOperations, seed=52)
 
     def test_code_preload(self):
-        utility.CProgramRunner.CProgramRunner(self.question.preloadedCode)
+        utility.CProgramRunner(self.question.preloadedCode)
 
     def test_task_text(self):
         assert "Перевести все гласные ['A', 'E', 'I', 'O', 'U', 'Y'] в верхний регистр" in self.question.questionText

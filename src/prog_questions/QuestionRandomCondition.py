@@ -1,8 +1,8 @@
-from .utility.CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from .QuestionBase import QuestionBase
+from .utility import CProgramRunner, CompilationError, ExecutionError
+from riscv_course.random_expressions.random_condition_loop import Task
 import random
 from textwrap import dedent
-from .generators.random_condition_loop import Task
-from .QuestionBase import QuestionBase
 
 PRELOADED_CODE = """\
 #include <stdio.h>

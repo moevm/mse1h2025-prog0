@@ -1,7 +1,7 @@
 from .QuestionBase import QuestionBase
-from .generators.random_expressions import get_expression
+from .utility import CProgramRunner, ExecutionError, CompilationError
+from riscv_course.random_expressions.random_expressions import get_expression
 import random
-from .utility.CProgramRunner import CProgramRunner, ExecutionError, CompilationError
 
 PRELOADED_CODE = '''#include <stdio.h>
 
