@@ -102,7 +102,7 @@ class QuestionStringOperations(QuestionBase):
             else:
                 new_words.append(word)
 
-        return " ".join(new_words)
+        return " ".join(new_words).strip()
 
     def test_case(self, runner: CProgramRunner, input_string: str, noise: bool = True):
         if noise:
