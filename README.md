@@ -219,11 +219,11 @@ class PrintSeedQuestion(QuestionBase):
 
 `preloadedCode: str` - код, который подгружается в поле редактирования кода.
 
-# Класс `QuestionRandomExpression`
+## Класс `QuestionRandomExpression`
 
 Класс для генерации и тестирования задач на вычисление выражений с использованием случайных данных.
 
-## Методы экземпляра класса
+### Методы класса
 
 ### `__init__(self, *, seed: int, vars=['x', 'y', 'z', 'w'], operations=['+', '-', '*', '&', '|'], length=5, minuses_threshold=0, brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0)`
 Метод инициализации экземпляра.
@@ -254,7 +254,7 @@ class PrintSeedQuestion(QuestionBase):
 - `"Ошибка выполнения [{exit_code}]: {error}"` — если код завершился с ошибкой выполнения.
 - Сообщение об ошибке теста с описанием входных данных и ожидаемого результата.
 
-## Свойства экземпляра класса
+### Свойства класса
 
 ### `preloadedCode: str`
 Код, который подгружается в поле редактирования кода. По умолчанию:
