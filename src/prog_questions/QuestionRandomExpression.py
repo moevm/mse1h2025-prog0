@@ -11,10 +11,7 @@ int main() {
 
 
 class QuestionRandomExpression(QuestionBase):
-    questionName = "Сложение чисел"
-    '''
-    Название вопроса
-    '''
+    questionName = "Вычисление выражения"
 
     def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=5,
                  minuses_threshold=0,

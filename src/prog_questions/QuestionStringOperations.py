@@ -46,9 +46,6 @@ int main() {
 
 class QuestionStringOperations(QuestionBase):
     questionName = 'Операции над строками'
-    '''
-    Название вопроса
-    '''
 
     def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1):
         """

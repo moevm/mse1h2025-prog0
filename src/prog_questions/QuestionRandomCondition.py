@@ -74,9 +74,6 @@ int main() {{
 
 class QuestionRandomCondition(QuestionBase):
     questionName = "Случайное условие"
-    '''
-    Название вопроса
-    '''
 
     def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1):
         """
