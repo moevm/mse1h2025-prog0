@@ -80,7 +80,7 @@ class QuestionStringOperations(QuestionBase):
         if self.strictness == 0.0 or len(input_string) >= self.max_length:
             return input_string
 
-        noise_chars = "!@#$%^&*()[]{}/?|~ "
+        noise_chars = "!@#$%^&*()[]{}/?|~"
         noise_level = int(self.strictness * 10)
 
         words = input_string.split(" ")
