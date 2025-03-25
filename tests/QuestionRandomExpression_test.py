@@ -6,7 +6,7 @@ class TestQuestionRandomExpression:
     question = moodleInit(QuestionRandomExpression, seed=52)
 
     def test_code_preload(self):
-        utility.CProgramRunner.CProgramRunner(self.question.preloadedCode)
+        utility.CProgramRunner(self.question.preloadedCode)
 
     def test_task_text(self):
         assert "w * y & w + x - y * w" in self.question.questionText
