@@ -45,9 +45,9 @@ class QuestionRandomExpression(QuestionBase):
         self.testing_vars = {key:value for key, value in zip(self.vars, self.testing_values)}
         self.testing_result = eval(self.questionExpression, self.testing_vars)
         self.strictness = strictness
-        self.min_tests = 20
-        self.max_tests = 50
-        self.space_amount = self.min_tests + self.strictness * (self.max_tests - self.min_tests)
+        self.min_space_number = 1
+        self.max_space_number = 15
+        self.space_amount = self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number)
 
     @property
     def questionName(self) -> str:
