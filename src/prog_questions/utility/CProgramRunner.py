@@ -115,7 +115,7 @@ class CProgramRunner:
                 exit_code=run_result.returncode
             )
 
-        return run_result.stdout.decode().strip()
+        return run_result.stdout.decode()
 
     def __del__(self):
         """Очистка временных файлов при удалении объекта"""
