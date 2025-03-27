@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from types import EllipsisType
 import sys
 import json
 
@@ -14,15 +15,16 @@ class QuestionBase(ABC):
         self.parameters = parameters
 
     @classmethod
-    def initTemplate(cls, **parameters):
+    def initTemplate(cls, *, seed: int | EllipsisType | None = None, **parameters):
         '''
         Инициализация в параметрах шаблона Twig
         parameters - любые параметры, необходимые для настройки (сложность, въедливость и т.п.).
         Ввиду особенностей coderunner и простоты реализации, параметры могут быть типами,
         поддерживающимися JSON (int, float, str, bool, None, array, dict)
         '''
-        stdinData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
-        seed = int(stdinData['seed'])
+        if seed is None or seed is Ellipsis:
+            stdinData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
+            seed = int(stdinData['seed'])
 
         return cls(seed=seed, **parameters)
 
