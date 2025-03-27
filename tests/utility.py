@@ -12,7 +12,7 @@ def moodleInit(questionClass: type[QuestionBase], *, seed: int, **parameters) ->
     parameters - параметры, с которыми будет создаваться вопрос
     Возвращаемое значение - созданный экземпляр класса
     '''
-    old_argv = sys.argv[:]
+    old_argv = sys.argv
     sys.argv = ['', f'seed={seed}']
 
     question = questionClass.initTemplate(**parameters)

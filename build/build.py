@@ -124,7 +124,7 @@ for file in sources:
         continue
 
     # Конвертация узла arguments в массив keyword
-    keywords = []
+    keywords = [ast.keyword(arg='seed', value=ast.Constant(value=Ellipsis))]
 
     if question_arguments is not None:
         for kw_name, kw_value in zip(question_arguments.kwonlyargs, question_arguments.kw_defaults):
