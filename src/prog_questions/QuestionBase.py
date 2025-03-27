@@ -18,6 +18,7 @@ class QuestionBase(ABC):
     def initTemplate(cls, *, seed: int | EllipsisType | None = None, **parameters):
         '''
         Инициализация в параметрах шаблона Twig
+        seed - сид вопроса. Если равен None или Ellipsis, то берётся тот, что предоставляет Moodle.
         parameters - любые параметры, необходимые для настройки (сложность, въедливость и т.п.).
         Ввиду особенностей coderunner и простоты реализации, параметры могут быть типами,
         поддерживающимися JSON (int, float, str, bool, None, array, dict)
