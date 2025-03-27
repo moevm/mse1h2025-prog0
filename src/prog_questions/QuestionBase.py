@@ -23,8 +23,8 @@ class QuestionBase(ABC):
         поддерживающимися JSON (int, float, str, bool, None, array, dict)
         '''
         if seed is None or seed is Ellipsis:
-            stdinData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
-            seed = int(stdinData['seed'])
+            argvData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
+            seed = int(argvData['seed'])
 
         return cls(seed=seed, **parameters)
 
