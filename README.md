@@ -29,7 +29,7 @@ python build/build.py
 ## Класс `QuestionBase` *(Абстрактный)*
 
 ### Методы класса
-- `initTemplate(cls, *, seed: int | None | EllipsisType, **parameters)`:
+- `initTemplate(cls, *, seed: int | EllipsisType | None, **parameters)`:
   - Инициализация в параметрах шаблона Twig.
   - `seed` - сид вопроса. Если равен None или Ellipsis, то берётся тот, что предоставляет Moodle.
   - `parameters` - любые параметры, поддерживаемые JSON.
