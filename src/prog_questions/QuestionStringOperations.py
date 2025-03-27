@@ -153,6 +153,3 @@ class QuestionStringOperations(QuestionBase):
         except ExecutionError as e:
             return f"Ошибка выполнения (код {e.exit_code}): {e}"
 
-
-q = QuestionStringOperations(seed=10, num_operations=3, min_length=10, max_length=50, strictness=1)
-print(q.questionText)
