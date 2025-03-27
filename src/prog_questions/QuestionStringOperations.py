@@ -17,22 +17,17 @@ QUESTION_TEXT = """
 <h4>Формат вывода</h4>
 <p>Вывести преобразованную строку после применения всех заданных операций.</p>
 <h5>Пример</h5>
-<table>
-    <tr>
-        <th>Входные данные</th>
-        <th>Выходные данные</th>
-    </tr>
-    <tr>
-        <td>
-            <strong>Строка:</strong> <code>HELLO_123 WORLD_456</code><br>
-            <strong>Операции:</strong>
-            <ul>
-                <li>Заменить все цифры остатками от деления на 3</li>
-                <li>Перевести все гласные буквы ['A', 'E', 'I', 'O', 'U', 'Y'] в нижний регистр</li>
-            </ul>
-        </td>
-        <td><code>HeLLo_120 WoRLD_120</code></td>
-    </tr>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Операции</th>
+            <th>Входные данные</th>
+            <th>Выходные данные</th>
+        </tr>
+    </thead>
+    <tbody>
+        {example}
+    </tbody>
 </table>
 """
 
@@ -42,6 +37,10 @@ int main() {
    return 0;
 }
 """
+
+
+def get_operation_html_description(operations):
+    return "\n".join(f"<p>{op.get_text()}</p>" for op in operations)
 
 
 class QuestionStringOperations(QuestionBase):
@@ -65,9 +64,19 @@ class QuestionStringOperations(QuestionBase):
     @property
     def questionText(self) -> str:
         dedent_question_text = dedent(QUESTION_TEXT)
+        input_strings = [
+            ([op], generate_input_string([op], 5, 30)) for op in self.operations
+        ]
+        input_strings.append((self.operations, generate_input_string(self.operations, 5, 50)))
+
         return dedent_question_text.format(
             max_length=self.max_length,
-            operations="\n".join(f"<li>{op.get_text()}</li>" for op in self.operations)
+            operations="\n".join(f"<li>{op.get_text()}</li>" for op in self.operations),
+            example="\n".join(f"<tr><td>{get_operation_html_description(string[0])}</td>"
+                              f"<td><code>{string[1]}</code>"
+                              f"</td><td><code>{apply_operations(string[1], string[0])}<code></td></tr>"
+                              for string in input_strings
+                              )
         )
 
     @property
