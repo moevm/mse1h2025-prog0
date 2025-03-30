@@ -39,7 +39,7 @@ BASE_TEXT = """\
                 <th>Выходные данные</th>
             </tr>
         </thead>
-        <tbody align="center">
+        <tbody>
             <tr>
                 <td><code>{input}</code></td>
                 <td><code>{output}</code></td>
