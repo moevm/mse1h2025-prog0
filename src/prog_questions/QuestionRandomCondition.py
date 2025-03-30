@@ -28,7 +28,11 @@ BASE_TEXT = """\
     <p>Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.</p>
     <h4>Пример</h4>
     <br>
-    <table border="1">
+    <table border="1" width="80%">
+    	<colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+  	    </colgroup>
         <thead>
             <tr>
                 <th>Входные данные</th>
