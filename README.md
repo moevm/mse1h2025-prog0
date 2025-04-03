@@ -29,9 +29,10 @@ python build/build.py
 ## Класс `QuestionBase` *(Абстрактный)*
 
 ### Методы класса
-- `initTemplate(cls, **parameters)`:
+- `initTemplate(cls, *, seed: int | EllipsisType | None, **parameters)`:
   - Инициализация в параметрах шаблона Twig.
-  - Параметры: Любые параметры, поддерживаемые JSON.
+  - `seed` - сид вопроса. Если равен None или Ellipsis, то берётся тот, что предоставляет Moodle.
+  - `parameters` - любые параметры, поддерживаемые JSON.
 
 - `initWithParameters(cls, parameters: str)`:
   - Инициализация с параметрами шаблона Twig.
