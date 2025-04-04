@@ -1,14 +1,11 @@
 # Сборка
 
-Для сборки необходимы зависимости, указанные в `requirements.txt`. Результат сборки помещается в `dist`. Запуск сборки:
+Для удобства сборка была вынесена в Docker. Запуск сборки:
 
 ```sh
-pip install requirements.txt
-
-python build/build.py
+docker build -t build-prog-questions .
+docker run --rm -v $PWD/src:/app/src -v $PWD/dist:/app/dist build-prog-questions
 ```
-
-# Документация
 
 ### Интеграция модуля генерации задач в CodeRunner
 
@@ -25,6 +22,8 @@ python build/build.py
 # GitHub Actions
 
 В проекте настроен workflow `.github/workflows/run-tests.yml`, запускающий тесты с отчётом о покрытии и сборку проекта. Workflow запускается при открытии пул реквеста или изменении ветки, связанной с ним, или при взаимодействии с веткой `main`.
+
+# Документация
 
 ## Класс `QuestionBase` *(Абстрактный)*
 
