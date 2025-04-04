@@ -13,6 +13,12 @@ int main() {
 }
 """
 
+PRELOADED_CODE_NERFED = """\
+void random_condition_solver(long long arr[{length}]) {{
+    // здесь нужен текст объясняющий что сигнатура уже дана
+}}
+"""
+
 BASE_TEXT = """\
     <h1>Условие задачи</h1>
     <p align="justify">Напишите программу, которая обрабатывает подаваемый на вход массив согласно условию. Условие необходимо пересчитывать после каждого изменения массива.</p>
@@ -77,10 +83,33 @@ int main() {{
 }}
 """
 
+HIDDEN_CODE_NERFED = """\
+#include <stdio.h>
+
+void random_condition_solver(long long arr[{array_length}]);
+
+int main() {{
+    long long arr[{array_length}];
+    int i;
+
+    for (int i = 0; i < {array_length}; i++) {{
+        scanf("%lld", &arr[i]);
+    }}
+
+    random_condition_solver(arr);
+
+    for (i = 0; i < {array_length}; i++) {{
+        printf("%lld ", arr[i]);
+    }}
+
+    return 0;
+}}
+"""
+
 class QuestionRandomCondition(QuestionBase):
     questionName = "Случайное условие"
 
-    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1):
+    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1, is_nerfed: bool=True):
         """
         :param seed: Seed для воспроизводимости тестов.
         :param condition_length: Длина условия задачи.
@@ -91,6 +120,7 @@ class QuestionRandomCondition(QuestionBase):
         self.task = Task(array_length, condition_length, seed)
         self.parse(self.task.text)
         self.seed = seed
+        self.is_nerfed = is_nerfed
         self.example_solution = EXAMPLE_CODE.format(
             array_length=self.task.array_length,
             condition_string=self.condtition_string,
@@ -123,6 +153,8 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def preloadedCode(self) -> str:
+        if self.is_nerfed:
+            return PRELOADED_CODE_NERFED.format(length = self.task.array_length)
         return PRELOADED_CODE
 
     # get arguments from task
@@ -140,6 +172,8 @@ class QuestionRandomCondition(QuestionBase):
         input = separator.join(map(str, arr))
 
         expected_output = self.expected_output_runner.run(input)
+
+        print(code)
 
         try:
             runner = CProgramRunner(code)
@@ -203,6 +237,9 @@ class QuestionRandomCondition(QuestionBase):
         random.seed(self.seed)
 
         edge_case_exponentiation = [2, 4, 7, 12]
+
+        if self.is_nerfed:
+            code = HIDDEN_CODE_NERFED.format(array_length=self.task.array_length) + code
 
         # same numbers testing
         for exponentiation in edge_case_exponentiation:
