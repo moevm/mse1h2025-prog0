@@ -54,6 +54,41 @@ BASE_TEXT = """\
 
 """
 
+BASE_TEXT_SIMPLE_MODE = """\
+    <h1>Условие задачи</h1>
+    <p align="justify">Напишите функцию, которая обрабатывает подаваемый на вход массив согласно условию. Условие необходимо пересчитывать после каждого изменения массива.</p>
+    <br>
+    <b>Ваше условие:</b>
+    <br>
+    {condition}
+    <br><br>
+    <p align="justify">Для нулевого элемента массива принять <b>arr[i - 1] = 0</b></p>
+    <h4>Формат входных данных</h4>
+    <p align="justify">На вход функции <code>random_condition_solver</code> подаётся массив чисел длины {array_length}.</p>
+    <h4>Формат выходных данных</h4>
+    <p align="justify">Возвращаемое значение отсутствует, поскольку работа с массивом осуществляется по указателю.</p>
+    <h4>Пример</h4>
+    <table border="1" width="100%">
+    	<colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+  	    </colgroup>
+        <thead align="center">
+            <tr>
+                <th>Входные данные</th>
+                <th>Выходные данные</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>{input}</code></td>
+                <td><code>{output}</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+"""
+
 EXAMPLE_CODE = """\
 #include <stdio.h>
 
@@ -135,7 +170,10 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        cleaned_text = dedent(BASE_TEXT)
+        if self.is_simple_task:
+            cleaned_text = dedent(BASE_TEXT_SIMPLE_MODE)
+        else:
+            cleaned_text = dedent(BASE_TEXT)
 
         input_arr = [random.randint(1, 500) for _ in range(self.parameters['array_length'])]
         input = " ".join(map(str, input_arr))
