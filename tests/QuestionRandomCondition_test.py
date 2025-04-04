@@ -4,14 +4,20 @@ from utility import moodleInit
 
 class TestQuestionRandomCondition:
     question = moodleInit(QuestionRandomCondition, seed=52, is_simple_task=False)
+    question_simple_mode = moodleInit(QuestionRandomCondition, seed=52, is_simple_task=True)
 
     def test_code_preload(self):
         utility.CProgramRunner(self.question.preloadedCode)
+        assert "random_condition_solver" in self.question_simple_mode.preloadedCode
 
     def test_task_text(self):
         assert "(arr[0] & arr[7] ^ arr[4] + arr[9]) > 275" in self.question.questionText
         assert "arr[i] = arr[i - 1] | 24" in self.question.questionText
         assert "arr[i] = arr[i] + 45" in self.question.questionText
+
+        assert "(arr[0] & arr[7] ^ arr[4] + arr[9]) > 275" in self.question_simple_mode.questionText
+        assert "arr[i] = arr[i - 1] | 24" in self.question_simple_mode.questionText
+        assert "arr[i] = arr[i] + 45" in self.question_simple_mode.questionText
 
     def test_code_success_run(self):
         assert self.question.test(
@@ -44,6 +50,23 @@ class TestQuestionRandomCondition:
                 return 0;
             }
 
+            '''
+        ) == 'OK'
+
+        assert self.question_simple_mode.test(
+            r'''
+            void random_condition_solver(long long arr[10]) {
+                for (int i = 0; i < 10; i++) {
+                    long long prev = (i - 1 >= 0) ? arr[i - 1] : 0;
+                    long long condition = arr[0] & arr[7] ^ arr[4] + arr[9];
+                    //printf("%d %lld %lld\n", i, arr[i], condition);
+                    if (condition > 275) {
+                        arr[i] = prev | 24;
+                    } else {
+                        arr[i] = arr[i] + 45;
+                    }
+                }
+            }
             '''
         ) == 'OK'
 
@@ -81,6 +104,23 @@ class TestQuestionRandomCondition:
             '''
         )
 
+        assert 'Ошибка компиляции' in self.question_simple_mode.test(
+            r'''
+            void random_condition_solver(long long arr[10]) {
+                for (int i = 0; i < 10; i++) {
+                    long long prev = (i - 1 >= 0) ? arr[i - 1] : 0;
+                    long long condition = arr[0] & arr[7] ^ arr[4] + arr[9];
+                    //printf("%d %lld %lld\n", i, arr[i], condition);
+                    if (condition > 275) {
+                        arr[i] = prev | 24
+                    } else {
+                        arr[i] = arr[i] + 45;
+                    }
+                }
+            }
+            '''
+        )
+
     def test_code_runtime_error(self):
         assert 'Ошибка выполнения' in self.question.test(
             r'''
@@ -112,6 +152,23 @@ class TestQuestionRandomCondition:
                 return 0;
             }
 
+            '''
+        )
+
+        assert 'Ошибка выполнения' in self.question_simple_mode.test(
+            r'''
+            void random_condition_solver(long long arr[10]) {
+                for (int i = 0; i < 10; i++) {
+                    long long prev = (i - 1 >= 0) ? arr[i - 1] : 0;
+                    long long condition = arr[0] & arr[7] ^ arr[4] + arr[9];
+                    //printf("%d %lld %lld\n", i, arr[i], condition);
+                    if (condition > 275) {
+                        arr[i] = prev | 24/0;
+                    } else {
+                        arr[i] = arr[i] + 45;
+                    }
+                }
+            }
             '''
         )
 
@@ -149,3 +206,19 @@ class TestQuestionRandomCondition:
             '''
         )
 
+        assert 'Ошибка: ожидалось' in self.question_simple_mode.test(
+            r'''
+            void random_condition_solver(long long arr[10]) {
+                for (int i = 0; i < 10; i++) {
+                    int prev = (i - 1 >= 0) ? arr[i - 1] : 0;
+                    int condition = arr[0] & arr[7] ^ arr[4] + arr[9];
+                    //printf("%d %lld %lld\n", i, arr[i], condition);
+                    if (condition > 275) {
+                        arr[i] = prev | 24;
+                    } else {
+                        arr[i] = arr[i] + 45;
+                    }
+                }
+            }
+            '''
+        )

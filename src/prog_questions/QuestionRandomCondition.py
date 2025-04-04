@@ -151,7 +151,7 @@ class QuestionRandomCondition(QuestionBase):
         :param array_length: Длина массива данных.
         :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
         """
-        super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness)
+        super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness, is_simple_task = is_simple_task)
         self.task = Task(array_length, condition_length, seed)
         self.parse(self.task.text)
         self.seed = seed
