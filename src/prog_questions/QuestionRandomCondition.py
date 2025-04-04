@@ -13,7 +13,7 @@ int main() {
 }
 """
 
-PRELOADED_CODE_NERFED = """\
+PRELOADED_CODE_SIMPLE_MODE = """\
 void random_condition_solver(long long arr[{length}]) {{
     // здесь нужен текст объясняющий что сигнатура уже дана
 }}
@@ -83,7 +83,7 @@ int main() {{
 }}
 """
 
-HIDDEN_CODE_NERFED = """\
+HIDDEN_CODE_SIMPLE_MODE = """\
 #include <stdio.h>
 
 void random_condition_solver(long long arr[{array_length}]);
@@ -109,7 +109,7 @@ int main() {{
 class QuestionRandomCondition(QuestionBase):
     questionName = "Случайное условие"
 
-    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1, is_nerfed: bool=True):
+    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1, is_simple_task: bool=True):
         """
         :param seed: Seed для воспроизводимости тестов.
         :param condition_length: Длина условия задачи.
@@ -120,7 +120,7 @@ class QuestionRandomCondition(QuestionBase):
         self.task = Task(array_length, condition_length, seed)
         self.parse(self.task.text)
         self.seed = seed
-        self.is_nerfed = is_nerfed
+        self.is_simple_task = is_simple_task
         self.example_solution = EXAMPLE_CODE.format(
             array_length=self.task.array_length,
             condition_string=self.condtition_string,
@@ -153,8 +153,8 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def preloadedCode(self) -> str:
-        if self.is_nerfed:
-            return PRELOADED_CODE_NERFED.format(length = self.task.array_length)
+        if self.is_simple_task:
+            return PRELOADED_CODE_SIMPLE_MODE.format(length = self.task.array_length)
         return PRELOADED_CODE
 
     # get arguments from task
@@ -238,8 +238,8 @@ class QuestionRandomCondition(QuestionBase):
 
         edge_case_exponentiation = [2, 4, 7, 12]
 
-        if self.is_nerfed:
-            code = HIDDEN_CODE_NERFED.format(array_length=self.task.array_length) + code
+        if self.is_simple_task:
+            code = HIDDEN_CODE_SIMPLE_MODE.format(array_length=self.task.array_length) + code
 
         # same numbers testing
         for exponentiation in edge_case_exponentiation:
