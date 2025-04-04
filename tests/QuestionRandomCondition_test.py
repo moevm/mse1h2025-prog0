@@ -3,7 +3,7 @@ from utility import moodleInit
 
 
 class TestQuestionRandomCondition:
-    question = moodleInit(QuestionRandomCondition, seed=52)
+    question = moodleInit(QuestionRandomCondition, seed=52, is_simple_task=False)
 
     def test_code_preload(self):
         utility.CProgramRunner(self.question.preloadedCode)
