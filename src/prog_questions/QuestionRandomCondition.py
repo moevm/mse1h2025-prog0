@@ -15,7 +15,7 @@ int main() {
 
 PRELOADED_CODE_SIMPLE_MODE = """\
 void random_condition_solver(long long arr[{length}]) {{
-    // здесь нужен текст объясняющий что сигнатура уже дана
+    // Используйте данную сигнатуру
 }}
 """
 
