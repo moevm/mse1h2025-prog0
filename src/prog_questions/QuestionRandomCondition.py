@@ -211,8 +211,6 @@ class QuestionRandomCondition(QuestionBase):
 
         expected_output = self.expected_output_runner.run(input)
 
-        print(code)
-
         try:
             runner = CProgramRunner(code)
             output = runner.run(input)
