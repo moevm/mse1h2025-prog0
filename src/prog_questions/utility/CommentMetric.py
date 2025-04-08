@@ -1,10 +1,49 @@
+import re
+
+
 class CommentMetric:
 
     def __init__(self, code: str):
-        self.code = code.split('\n')
+        self.code = self._split_code(code)
         self.total_lines = len(self.code)
         self.comment_lines = 0
         self.comment_percentage = self._count_comments()
+
+    def _split_code(self, code: str) -> list:
+        lines = []
+        current_line = ''
+        i = 0
+        while i < len(code):
+            if code[i] == '\n':
+                # Проверка на функции
+                if self._is_in_function(code, i):
+                    current_line += '\n'
+                else:
+                    lines.append(current_line)
+                    current_line = ''
+            else:
+                current_line += code[i]
+            i += 1
+        lines.append(current_line)
+        return lines
+
+    def _is_in_function(self, code: str, pos: int) -> bool:
+        # Ищем вызовы функций
+        functions = ['printf', 'puts', 'fwrite', 'write']
+        for func in functions:
+            # Проверка на вызов функции перед позицией
+            matches = [m for m in re.finditer(r'\b' + func + r'\s*\(', code[:pos])]
+            for match in reversed(matches):
+                # Проверка на то, что вызов функции заканчивается перед позицией
+                end_pos = code.find(');', match.end())
+                if end_pos != -1 and end_pos <= pos:
+                    continue
+                # Проверка на то, что \n находится внутри строки функции
+                open_quote = code.rfind('"', match.end(), pos)
+                close_quote = code.find('"', match.end())
+                if open_quote != -1 and close_quote != -1:
+                    return True
+        return False
 
     def _count_comments(self) -> float:
         in_block_comment = False
