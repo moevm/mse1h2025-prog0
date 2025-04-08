@@ -2,14 +2,31 @@ import re
 
 
 class CommentMetric:
+    """
+    Класс для анализа комментариев в коде на языке C.
+    Attributes:
+        code (list): Список строк кода.
+        total_lines (int): Общее количество строк кода.
+        comment_lines (int): Количество строк с комментариями.
+        comment_percentage (float): Процент строк с комментариями.
+    """
 
     def __init__(self, code: str):
+        """
+        Инициализирует объект класса CommentMetric.
+        :param code: Исходный код на языке C в виде строки.
+        """
         self.code = self._split_code(code)
         self.total_lines = len(self.code)
         self.comment_lines = 0
         self.comment_percentage = self._count_comments()
 
     def _split_code(self, code: str) -> list:
+        """
+        Разбивает код на строки, учитывая переносы строк внутри функций.
+        :param code: Исходный код на языке C.
+        :return: Список строк кода.
+        """
         lines = []
         current_line = ''
         i = 0
@@ -28,6 +45,12 @@ class CommentMetric:
         return lines
 
     def _is_in_function(self, code: str, pos: int) -> bool:
+        """
+        Проверяет, находится ли позиция внутри вызова функции.
+        :param code: Исходный код на языке C.
+        :param pos: Позиция в коде.
+        :return: True, если позиция внутри вызова функции, False иначе.
+        """
         # Ищем вызовы функций
         functions = ['printf', 'puts', 'fwrite', 'write']
         for func in functions:
@@ -46,6 +69,10 @@ class CommentMetric:
         return False
 
     def _count_comments(self) -> float:
+        """
+        Подсчитывает количество строк с комментариями и вычисляет процент комментариев.
+        :return: Процент строк с комментариями.
+        """
         in_block_comment = False
         for line in self.code:
             if (not in_block_comment and ('//' in line or '/*' in line)) or in_block_comment:
@@ -72,4 +99,8 @@ class CommentMetric:
             return 0
 
     def get_comment_percentage(self) -> float:
+        """
+        Возвращает процент строк с комментариями.
+        :return: Процент строк с комментариями.
+        """
         return self.comment_percentage
