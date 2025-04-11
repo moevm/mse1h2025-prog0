@@ -151,4 +151,8 @@ if __name__ == '__main__':
         # Запись в файл и вывод в консоль
         xml_output_path = OUTPUT_PATH / f'{question_class}.xml'
         xml_template.write(xml_output_path, xml_declaration=True, encoding='utf-8')
-        print(xml_output_path)
+
+    # Вывод информации о собранных вопросах
+    print("Задачи успешно собраны:")
+    for built_file in OUTPUT_PATH.glob('*.xml'):
+        print(built_file.name)
