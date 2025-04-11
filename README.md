@@ -4,7 +4,7 @@
 
 ```sh
 docker build -t build-prog-questions .
-docker run --rm -v $PWD/src:/app/src -v $PWD/dist:/app/dist build-prog-questions
+docker run --rm -v $PWD/src:/app/src:ro -v $PWD/dist:/app/dist build-prog-questions
 ```
 
 ### Интеграция модуля генерации задач в CodeRunner
