@@ -75,23 +75,35 @@ class CommentMetric:
         """
         in_block_comment = False
         for line in self.code:
-            if (not in_block_comment and ('//' in line or '/*' in line)) or in_block_comment:
-                self.comment_lines += 1
-
-                i = 0
-                while i < len(line) - 1:
-                    # ситуации // что угодно дальше, но не /* //
-                    if not in_block_comment and line[i:i + 2] == '//':
-                        break
-                    # ситуации /* не в многострочном комментарии и что угодно дальше
-                    elif not in_block_comment and line[i:i + 2] == '/*':
-                        i += 1
-                        in_block_comment = True
-                    # ситуации  */ при нахождении в многострочном комментарии и что угодно дальше
-                    elif in_block_comment and line[i:i + 2] == '*/':
-                        i += 1
-                        in_block_comment = False
+            is_comment_line = False
+            is_in_quote = False
+            if in_block_comment:
+                is_comment_line = True
+            i = 0
+            while i < len(line) - 1:
+                # если комментарий внутри строки, он не будет считаться
+                if line[i] == '"' and not in_block_comment:
+                    is_in_quote = not is_in_quote
+                if is_in_quote:
                     i += 1
+                    continue
+
+                # ситуации // что угодно дальше, но не /* //
+                if not in_block_comment and line[i:i + 2] == '//':
+                    if not is_in_quote:
+                        is_comment_line = True
+                        break
+                # ситуации /* не в многострочном комментарии и что угодно дальше
+                elif not in_block_comment and line[i:i + 2] == '/*':
+                    if not is_in_quote:
+                        is_comment_line = True
+                        in_block_comment = True
+                # ситуации  */ при нахождении в многострочном комментарии и что угодно дальше
+                elif in_block_comment and line[i:i + 2] == '*/':
+                    in_block_comment = False
+                i += 1
+            if is_comment_line:
+                self.comment_lines += 1
 
         if self.total_lines > 0:
             return round((self.comment_lines / self.total_lines) * 100)
