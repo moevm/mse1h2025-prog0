@@ -16,7 +16,7 @@ OUTPUT_PATH = ROOT / 'dist'
 XML_TEMPLATE_PATH = ROOT / 'build' / 'template.xml'
 
 
-# Класс извлечения узла аргументов из конструктора класса и именя вопроса
+# Класс извлечения узла аргументов из конструктора класса и имени задачи
 class InternalQuestionDataExtractor(ast.NodeVisitor):
     def visit_FunctionDef(self, node):
         if node.name != '__init__':
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     os.unlink(bundle_tempfile.name)
 
 
-    # Загрузка xml-шаблона вопроса и создание записи об zip-архиве
+    # Загрузка xml-шаблона задачи и создание записи об zip-архиве
     with XML_TEMPLATE_PATH.open('r', encoding='utf-8') as xml_file:
         xml_parser = xml.XMLParser(strip_cdata=False)
         xml_template = xml.parse(xml_file, xml_parser)
@@ -117,10 +117,10 @@ if __name__ == '__main__':
 
     # Проверка для всех файлов проекта
     for file in sources:
-        # Получение информации о классе вопроса из файла
+        # Получение информации о классе задачи из файла
         question_class, question_arguments, question_name = QuestionDataExtractor().extract(ast.parse(file.read_text(encoding='utf-8')))
 
-        # Если в файле нет класса вопроса - пропускаем
+        # Если в файле нет класса задачи - пропускаем
         if question_class is None:
             continue
 
@@ -152,7 +152,7 @@ if __name__ == '__main__':
         xml_output_path = OUTPUT_PATH / f'{question_class}.xml'
         xml_template.write(xml_output_path, xml_declaration=True, encoding='utf-8')
 
-    # Вывод информации о собранных вопросах
+    # Вывод информации о собранных задачах
     print("Задачи успешно собраны:")
     for built_file in OUTPUT_PATH.glob('*.xml'):
         print(built_file.name)
