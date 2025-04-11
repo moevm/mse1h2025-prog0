@@ -7,6 +7,10 @@ docker build -t build-prog-questions .
 docker run --rm -v $PWD/src:/app/src:ro -v $PWD/dist:/app/dist build-prog-questions
 ```
 
+После удачной сборки в консоль должны вывестись пути собранных xml файлов. Пример вывода при удачной сборке:
+
+![Пример вывода при удачной сборке](.github/images/success.png)
+
 ### Интеграция модуля генерации задач в CodeRunner
 
 После сборки необходимо импортировать XML файл в систему Moodle.
