@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from types import EllipsisType
 import sys
 import json
-from utility import CommentMetric
+from .utility import CommentMetric
 
 
 class QuestionBase(ABC):
