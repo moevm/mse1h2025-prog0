@@ -82,13 +82,13 @@ class QuestionBase(ABC):
         Возвращаемое значение - JSON в виде строки для шаблона-комбинатора
         '''
         result = self.test(code)
+        success = result == 'OK'
         output = {
-            'got': result,
-            'fraction': 1.0 if result == 'OK' else 0.0,
-            'testresults': [["Test", "testcode"], ["Expected", "expected"], ["Got", "got"]],
+            'fraction': 1.0 if success else 0.0,
+            'testresults': [['iscorrect', 'Тест', 'Ожидаемый', 'Получено', 'iscorrect'], [success, '#1', 'OK', result, success]],
         }
 
-        if result == 'OK':
+        if success:
             commentsPercent = CommentMetric(code).get_comment_percentage()
             output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent:.2f}%</p>'
 
