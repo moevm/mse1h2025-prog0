@@ -90,6 +90,6 @@ class QuestionBase(ABC):
 
         if success:
             commentsPercent = CommentMetric(code).get_comment_percentage()
-            output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent:.2f}%</p>'
+            output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
 
         return json.dumps(output)
