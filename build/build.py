@@ -99,19 +99,19 @@ if __name__ == '__main__':
 
     # Шаблоны кода, внедряемого в xml-файл
     parameters_code_template = r'''import sys
-    sys.path.insert(0, 'bundle.zip')
-    from prog_questions import {class_name}
+sys.path.insert(0, 'bundle.zip')
+from prog_questions import {class_name}
 
-    question = {constructor_code}
-    print(question.getTemplateParameters())
+question = {constructor_code}
+print(question.getTemplateParameters())
     '''
 
     code_template = r'''import sys
-    sys.path.insert(0, 'bundle.zip')
-    from prog_questions import {class_name}
+sys.path.insert(0, 'bundle.zip')
+from prog_questions import {class_name}
 
-    question = {class_name}.initWithParameters("""{{{{ PARAMETERS | e('py') }}}}""")
-    print(question.runTest("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
+question = {class_name}.initWithParameters("""{{{{ PARAMETERS | e('py') }}}}""")
+print(question.runTest("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
     '''
 
 
