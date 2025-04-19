@@ -111,7 +111,7 @@ if __name__ == '__main__':
     from prog_questions import {class_name}
 
     question = {class_name}.initWithParameters("""{{{{ PARAMETERS | e('py') }}}}""")
-    print(question.test("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
+    print(question.runTest("""{{{{ STUDENT_ANSWER | e('py') }}}}"""))
     '''
 
 
