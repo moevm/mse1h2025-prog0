@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from types import EllipsisType
 import sys
 import json
+from .utility import CommentMetric
 
 
 class QuestionBase(ABC):
@@ -73,3 +74,22 @@ class QuestionBase(ABC):
         Если всё хорошо - вернуть "OK"
         '''
         ...
+
+    def runTest(self, code: str) -> str:
+        '''
+        Запуск проверки кода и подсчёта процента коментариев в коде
+        code - код, отправленный студентом на проверку
+        Возвращаемое значение - JSON в виде строки для отображения результата шаблону-комбинатору
+        '''
+        result = self.test(code)
+        success = result == 'OK'
+        output = {
+            'fraction': 1.0 if success else 0.0,
+            'testresults': [['iscorrect', 'Тест', 'Ожидаемый', 'Получено', 'iscorrect'], [success, '#1', 'OK', result, success]],
+        }
+
+        if success:
+            commentsPercent = CommentMetric(code).get_comment_percentage()
+            output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
+
+        return json.dumps(output)
