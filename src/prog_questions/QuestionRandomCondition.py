@@ -14,7 +14,7 @@ int main() {
 """
 
 PRELOADED_CODE_SIMPLE_MODE = """\
-void random_condition_solver(long long arr[{length}]) {{
+void random_condition_solver(long long *arr, size_t arr_length) {{
     // Используйте данную сигнатуру
 }}
 """
@@ -64,7 +64,7 @@ BASE_TEXT_SIMPLE_MODE = """\
     <br><br>
     <p align="justify">Для нулевого элемента массива принять <b>arr[i - 1] = 0</b></p>
     <h4>Формат входных данных</h4>
-    <p align="justify">На вход функции <code>random_condition_solver</code> подаётся массив чисел длины {array_length}.</p>
+    <p align="justify">На вход функции <code>random_condition_solver</code> подаётся указатель на массив чисел <code>arr</code> и его длина <code>arr_length</code>.</p>
     <h4>Формат выходных данных</h4>
     <p align="justify">Возвращаемое значение отсутствует, поскольку работа с массивом осуществляется по указателю.</p>
     <h4>Пример</h4>
@@ -121,7 +121,7 @@ int main() {{
 HIDDEN_CODE_SIMPLE_MODE = """\
 #include <stdio.h>
 
-void random_condition_solver(long long arr[{array_length}]);
+void random_condition_solver(long long *arr, size_t arr_length);
 
 int main() {{
     long long arr[{array_length}];
@@ -131,7 +131,7 @@ int main() {{
         scanf("%lld", &arr[i]);
     }}
 
-    random_condition_solver(arr);
+    random_condition_solver(arr, {array_length});
 
     for (i = 0; i < {array_length}; i++) {{
         printf("%lld ", arr[i]);
