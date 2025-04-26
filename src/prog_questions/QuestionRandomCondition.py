@@ -13,6 +13,12 @@ int main() {
 }
 """
 
+PRELOADED_CODE_SIMPLE_MODE = """\
+void random_condition_solver(long long *arr, size_t arr_length) {{
+    // Используйте данную сигнатуру
+}}
+"""
+
 BASE_TEXT = """\
     <h1>Условие задачи</h1>
     <p align="justify">Напишите программу, которая обрабатывает подаваемый на вход массив согласно условию. Условие необходимо пересчитывать после каждого изменения массива.</p>
@@ -26,6 +32,41 @@ BASE_TEXT = """\
     <p align="justify">На вход программе в stdin подаётся массив чисел длины {array_length}. Числа разделены пробелами (не обязательно одним).</p>
     <h4>Формат выходных данных</h4>
     <p align="justify">Изменённый массив необходимо вернуть в stdout, элементы разделить пробелами.</p>
+    <h4>Пример</h4>
+    <table border="1" width="100%">
+    	<colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+  	    </colgroup>
+        <thead align="center">
+            <tr>
+                <th>Входные данные</th>
+                <th>Выходные данные</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>{input}</code></td>
+                <td><code>{output}</code></td>
+            </tr>
+        </tbody>
+    </table>
+
+"""
+
+BASE_TEXT_SIMPLE_MODE = """\
+    <h1>Условие задачи</h1>
+    <p align="justify">Напишите функцию, которая обрабатывает подаваемый на вход массив согласно условию. Условие необходимо пересчитывать после каждого изменения массива.</p>
+    <br>
+    <b>Ваше условие:</b>
+    <br>
+    {condition}
+    <br><br>
+    <p align="justify">Для нулевого элемента массива принять <b>arr[i - 1] = 0</b></p>
+    <h4>Формат входных данных</h4>
+    <p align="justify">На вход функции <code>random_condition_solver</code> подаётся указатель на массив чисел <code>arr</code> и его длина <code>arr_length</code>.</p>
+    <h4>Формат выходных данных</h4>
+    <p align="justify">Возвращаемое значение отсутствует, поскольку работа с массивом осуществляется по указателю.</p>
     <h4>Пример</h4>
     <table border="1" width="100%">
     	<colgroup>
@@ -77,20 +118,44 @@ int main() {{
 }}
 """
 
+HIDDEN_CODE_SIMPLE_MODE = """\
+#include <stdio.h>
+
+void random_condition_solver(long long *arr, size_t arr_length);
+
+int main() {{
+    long long arr[{array_length}];
+    int i;
+
+    for (int i = 0; i < {array_length}; i++) {{
+        scanf("%lld", &arr[i]);
+    }}
+
+    random_condition_solver(arr, {array_length});
+
+    for (i = 0; i < {array_length}; i++) {{
+        printf("%lld ", arr[i]);
+    }}
+
+    return 0;
+}}
+"""
+
 class QuestionRandomCondition(QuestionBase):
     questionName = "Случайное условие"
 
-    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1):
+    def __init__(self, *, seed: int, condition_length: int=4, array_length: int=10, strictness: float=1, is_simple_task: bool=True):
         """
         :param seed: Seed для воспроизводимости тестов.
         :param condition_length: Длина условия задачи.
         :param array_length: Длина массива данных.
         :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
         """
-        super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness)
+        super().__init__(seed=seed, condition_length=condition_length, array_length=array_length, strictness=strictness, is_simple_task = is_simple_task)
         self.task = Task(array_length, condition_length, seed)
         self.parse(self.task.text)
         self.seed = seed
+        self.is_simple_task = is_simple_task
         self.example_solution = EXAMPLE_CODE.format(
             array_length=self.task.array_length,
             condition_string=self.condtition_string,
@@ -105,7 +170,10 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        cleaned_text = dedent(BASE_TEXT)
+        if self.is_simple_task:
+            cleaned_text = dedent(BASE_TEXT_SIMPLE_MODE)
+        else:
+            cleaned_text = dedent(BASE_TEXT)
 
         input_arr = [random.randint(1, 500) for _ in range(self.parameters['array_length'])]
         input = " ".join(map(str, input_arr))
@@ -123,6 +191,8 @@ class QuestionRandomCondition(QuestionBase):
 
     @property
     def preloadedCode(self) -> str:
+        if self.is_simple_task:
+            return PRELOADED_CODE_SIMPLE_MODE.format(length = self.task.array_length)
         return PRELOADED_CODE
 
     # get arguments from task
@@ -203,6 +273,9 @@ class QuestionRandomCondition(QuestionBase):
         random.seed(self.seed)
 
         edge_case_exponentiation = [2, 4, 7, 12]
+
+        if self.is_simple_task:
+            code = HIDDEN_CODE_SIMPLE_MODE.format(array_length=self.task.array_length) + code
 
         # same numbers testing
         for exponentiation in edge_case_exponentiation:
