@@ -166,7 +166,7 @@ class QuestionStringOperations(QuestionBase):
             dedent_hidden_code = dedent(SIMPLE_HIDDEN_CODE)
             code = dedent_hidden_code.format(
                 N=self.max_length,
-                student_method=code
+                student_method=code.replace('{', '{{').replace('}', '}}')
             )
         try:
             random.seed(self.seed)
