@@ -4,9 +4,12 @@ from riscv_course.random_expressions.string_operations import generate_operation
 from textwrap import dedent
 import random
 
+TASK_DESCRIPTION = "Дана строка, содержащая латинские буквы (в верхнем и нижнем регистрах), цифры, пробелы, специальные символы (!@#$%^&*()[]{{}}/?|~) и знаки подчеркивания. Необходимо написать программу, которая выполняет над этой строкой операции, указанные ниже."
+SIMPLE_TASK_DESCRIPTION = "Дана строка, содержащая латинские буквы (в верхнем и нижнем регистрах), цифры, пробелы, специальные символы (!@#$%^&*()[]{{}}/?|~) и знаки подчеркивания. Необходимо функцию processString, которая выполняет над этой строкой операции, указанные ниже."
+
 QUESTION_TEXT = """
 <h1>Условие задачи</h1>
-<p align="justify">Дана строка, содержащая латинские буквы (в верхнем и нижнем регистрах), цифры, пробелы, специальные символы (!@#$%^&*()[]{{}}/?|~) и знаки подчеркивания. Необходимо выполнить над этой строкой одну или несколько операций.</p>
+<p align="justify">{task_description}</p>
 <br>
 <b>Ваше условие:</b>
 <br>
@@ -43,6 +46,35 @@ int main() {
 }
 """
 
+SIMPLE_HIDDEN_CODE = """
+#include <stdio.h>
+#include <string.h>
+
+{student_method}
+
+int main() {
+    char str[{N}+1];
+
+    if (fgets(str, sizeof(str), stdin) != NULL) {
+        size_t len = strlen(str);
+        if (len > 0 && str[len-1] == '\n') {
+            str[len-1] = '\0';
+        }
+        processString(str);
+        printf("%s", str);
+    } else {
+        printf("Ошибка ввода.\n");
+    }
+    return 0;
+}
+"""
+
+SIMPLE_PRELOADED_CODE = """
+void processString(char *str) {
+    // Решите задачу внутри этого метода
+}
+"""
+
 
 def get_operation_html_description(operations):
     return "\n".join(f"<p>{op.get_text()}</p>" for op in operations)
@@ -51,13 +83,14 @@ def get_operation_html_description(operations):
 class QuestionStringOperations(QuestionBase):
     questionName = 'Операции над строками'
 
-    def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1):
+    def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1, is_simple_task: bool=True):
         """
         :param seed: Seed для воспроизводимости тестов.
         :param num_operations: количество операций задачи.
         :param min_length: минимальная длина входных данных.
         :param max_length: максимальная длина входных данных.
         :param strictness: Параметр для регулирования количества случайных тестов (0.0 - минимум, 1.0 - максимум).
+        :param is_simple_task: Флаг, который определяет режим работы программы (True - простой режим, False - сложный режим)
         """
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness)
@@ -65,6 +98,7 @@ class QuestionStringOperations(QuestionBase):
         self.operations = generate_operations(seed, num_operations)
         self.min_length = min_length
         self.max_length = max_length
+        self.is_simple_task = is_simple_task
 
     @property
     def questionText(self) -> str:
@@ -81,12 +115,13 @@ class QuestionStringOperations(QuestionBase):
                               f"<td><code>{string[1]}</code>"
                               f"</td><td><code>{apply_operations(string[1], string[0])}<code></td></tr>"
                               for string in input_strings
-                              )
+                              ),
+            task_description=SIMPLE_TASK_DESCRIPTION if self.is_simple_task else TASK_DESCRIPTION
         )
 
     @property
     def preloadedCode(self) -> str:
-        return PRELOADED_CODE
+        return SIMPLE_PRELOADED_CODE if self.is_simple_task else PRELOADED_CODE
 
     def noise_input_string(self, input_string: str):
         if self.strictness == 0.0 or len(input_string) >= self.max_length:
@@ -127,6 +162,12 @@ class QuestionStringOperations(QuestionBase):
             return f"Ошибка: ожидалось '{expected_output}', получено '{output}'"
 
     def test(self, code: str) -> str:
+        if self.is_simple_task:
+            dedent_hidden_code = dedent(SIMPLE_HIDDEN_CODE)
+            code = dedent_hidden_code.format(
+                N=self.max_length,
+                student_method=code
+            )
         try:
             random.seed(self.seed)
             runner = CProgramRunner(code)
