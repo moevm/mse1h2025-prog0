@@ -19,8 +19,9 @@ QUESTION_TEXT = """
 <h4>Пример</h4>
 <table border="1" width="100%">
 	<colgroup>
-        <col style="width: 50%;">
-        <col style="width: 50%;">
+        <col style="width: 33%;">
+        <col style="width: 33%;">
+        <col style="width: 34%;">
   	</colgroup>
     <thead align="center">
         <tr>
