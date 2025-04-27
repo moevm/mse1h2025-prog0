@@ -46,27 +46,26 @@ int main() {
 }
 """
 
-SIMPLE_HIDDEN_CODE = """
+SIMPLE_HIDDEN_CODE = r"""
 #include <stdio.h>
 #include <string.h>
 
-{student_method}
+void processString(char *str);
 
-int main() {
-    char str[{N}+1];
+int main() {{
+    char str[2*{N}+1];
 
-    if (fgets(str, sizeof(str), stdin) != NULL) {
+    if (fgets(str, sizeof(str), stdin) != NULL) {{
         size_t len = strlen(str);
-        if (len > 0 && str[len-1] == '\n') {
+        if (len > 0 && str[len-1] == '\n') {{
             str[len-1] = '\0';
-        }
-        processString(str);
-        printf("%s", str);
-    } else {
-        printf("Ошибка ввода.\n");
-    }
+        }}
+    }}
+
+    processString(str);
+    printf("%s", str);
     return 0;
-}
+}}
 """
 
 SIMPLE_PRELOADED_CODE = """
@@ -163,11 +162,7 @@ class QuestionStringOperations(QuestionBase):
 
     def test(self, code: str) -> str:
         if self.is_simple_task:
-            dedent_hidden_code = dedent(SIMPLE_HIDDEN_CODE)
-            code = dedent_hidden_code.format(
-                N=self.max_length,
-                student_method=code.replace('{', '{{').replace('}', '}}')
-            )
+            code = SIMPLE_HIDDEN_CODE.format(N=self.max_length) + code
         try:
             random.seed(self.seed)
             runner = CProgramRunner(code)
