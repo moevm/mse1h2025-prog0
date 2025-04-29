@@ -19,40 +19,39 @@ class TestSimpleQuestionRandomCondition:
     def test_code_success_run(self):
         assert self.question.test(
             r'''
-            int isVowel(char c) {
-                // Проверяем только по заглавным буквам
-                c = toupper((unsigned char)c);
-                return c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U' || c == 'Y';
-            }
-
-            void processString(char *str) {
-                int len = strlen(str);
-
-                // Считаем количество '_'
-                int underscoreCount = 0;
-                for (int i = 0; i < len; i++) {
-                    if (str[i] == '_') {
-                        underscoreCount++;
-                    }
+            void processString(char* str)
+                char* symbol = str;
+                while (*symbol) {
+                    if (strchr("aeiouy", *symbol)) *symbol -= 'a' - 'A';
+                    symbol++;
                 }
 
-                int underscoreReplacement;
-                if (underscoreCount > 7) {
-                    underscoreReplacement = underscoreCount % 13;
-                } else {
-                    underscoreReplacement = underscoreCount;
+                size_t underscore_count = 0;
+                symbol = str;
+                while (*symbol) {
+                    if (*symbol == '_') underscore_count++;
+                    symbol++;
                 }
 
-                // Применяем все операции к строке
-                for (int i = 0; i < len; i++) {
-                    if (isVowel(str[i])) {
-                        str[i] = toupper((unsigned char)str[i]);
-                    } else if (str[i] == ' ') {
-                        str[i] = '0' + underscoreReplacement;
-                    } else if (isdigit((unsigned char)str[i])) {
-                        int digit = str[i] - '0';
-                        str[i] = (digit % 2) + '0';
+                if (underscore_count > 7) underscore_count %= 13;
+
+                char target_number[5] = { 0 };
+                snprintf(target_number, sizeof(target_number), "%zu", underscore_count);
+
+                symbol = str;
+                while (*symbol) {
+                    if (*symbol == ' ') {
+                        memmove(symbol + strlen(target_number), symbol + 1, strlen(symbol + 1) + 1);
+                        strncpy(symbol, target_number, strlen(target_number));
+                        symbol += strlen(target_number) - 1;
                     }
+                    symbol++;
+                }
+            
+                symbol = str;
+                while (*symbol) {
+                    if (strchr("0123456789", *symbol)) *symbol = ((*symbol - '0') % 2) + '0';
+                    symbol++;
                 }
             }
             '''
