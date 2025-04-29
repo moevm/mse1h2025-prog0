@@ -19,7 +19,7 @@ class TestSimpleQuestionRandomCondition:
     def test_code_success_run(self):
         assert self.question.test(
             r'''
-            void processString(char* str)
+            void processString(char* str){
                 char* symbol = str;
                 while (*symbol) {
                     if (strchr("aeiouy", *symbol)) *symbol -= 'a' - 'A';
