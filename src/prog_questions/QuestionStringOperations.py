@@ -92,7 +92,7 @@ class QuestionStringOperations(QuestionBase):
         :param is_simple_task: Флаг, который определяет режим работы программы (True - простой режим, False - сложный режим)
         """
         super().__init__(seed=seed, num_operations=num_operations,
-                         min_length=min_length, max_length=max_length, strictness=strictness)
+                         min_length=min_length, max_length=max_length, strictness=strictness, is_simple_task=is_simple_task)
         self.strictness = strictness
         self.operations = generate_operations(seed, num_operations)
         self.min_length = min_length
