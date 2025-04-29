@@ -1,6 +1,11 @@
 from prog_questions import QuestionStringOperations, utility
 from utility import moodleInit
 
+SEED_OPERATIONS = [
+    "Перевести все гласные ['A', 'E', 'I', 'O', 'U', 'Y'] в верхний регистр",
+    "Замените каждый пробел на число символов “_” в исходной строке. Если число больше 7, то укажите его остаток от деления на 13",
+    "Замените все цифры в строке остатками их деления на 2"
+]
 
 class TestSimpleQuestionRandomCondition:
     question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=True)
@@ -9,9 +14,7 @@ class TestSimpleQuestionRandomCondition:
         assert "main" not in self.question.preloadedCode
 
     def test_task_text(self):
-        assert "Перевести все гласные ['A', 'E', 'I', 'O', 'U', 'Y'] в верхний регистр" in self.question.questionText
-        assert "Замените каждый пробел на число символов “_” в исходной строке. Если число больше 7, то укажите его остаток от деления на 13" in self.question.questionText
-        assert "Замените все цифры в строке остатками их деления на 2" in self.question.questionText
+        assert all(op in self.question.questionText for op in SEED_OPERATIONS)
 
     def test_code_success_run(self):
         assert self.question.test(
@@ -91,9 +94,7 @@ class TestQuestionRandomCondition:
         utility.CProgramRunner(self.question.preloadedCode)
 
     def test_task_text(self):
-        assert "Перевести все гласные ['A', 'E', 'I', 'O', 'U', 'Y'] в верхний регистр" in self.question.questionText
-        assert "Замените каждый пробел на число символов “_” в исходной строке. Если число больше 7, то укажите его остаток от деления на 13" in self.question.questionText
-        assert "Замените все цифры в строке остатками их деления на 2" in self.question.questionText
+        assert all(op in self.question.questionText for op in SEED_OPERATIONS)
 
     def test_code_success_run(self):
         assert self.question.test(
