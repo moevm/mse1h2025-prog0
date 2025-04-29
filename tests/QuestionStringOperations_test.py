@@ -79,13 +79,7 @@ class TestSimpleQuestionRandomCondition:
         )
 
     def test_code_wrong_answer(self):
-        assert 'Ошибка: ожидалось' in self.question.test(
-            r'''
-            void processString(char *str) {
-
-            }
-            '''
-        )
+        assert 'Ошибка: ожидалось' in self.question.test(self.question.preloadedCode)
 
 class TestQuestionRandomCondition:
     question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=False)
