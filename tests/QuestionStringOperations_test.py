@@ -59,13 +59,7 @@ class TestSimpleQuestionRandomCondition:
         ) == 'OK'
 
     def test_code_compile_error(self):
-        assert 'Ошибка компиляции' in self.question.test(
-            r'''
-            void processString(char *str) {
-                innt a = 0;
-            }
-            '''
-        )
+        assert 'Ошибка компиляции' in self.question.test('')
 
     def test_code_runtime_error(self):
         assert 'Ошибка выполнения' in self.question.test(
@@ -73,7 +67,6 @@ class TestSimpleQuestionRandomCondition:
             void processString(char *str) {
                 int *ptr = NULL;
                 *ptr = 42;
-                return 0;
             }
             '''
         )
