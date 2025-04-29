@@ -11,7 +11,7 @@ class TestSimpleQuestionRandomCondition:
     question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=True)
 
     def test_code_preload(self):
-        assert "main" not in self.question.preloadedCode
+        assert "main" not in self.question.preloadedCode and "processString" in self.question.preloadedCode
 
     def test_task_text(self):
         assert all(op in self.question.questionText for op in SEED_OPERATIONS)
