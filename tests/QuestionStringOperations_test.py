@@ -47,7 +47,7 @@ class TestSimpleQuestionRandomCondition:
                     }
                     symbol++;
                 }
-            
+
                 symbol = str;
                 while (*symbol) {
                     if (strchr("0123456789", *symbol)) *symbol = ((*symbol - '0') % 2) + '0';

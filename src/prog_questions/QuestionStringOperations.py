@@ -53,7 +53,7 @@ SIMPLE_HIDDEN_CODE = r"""
 void processString(char *str);
 
 int main() {{
-    char str[2*{N}+1];
+    char str[2*{N}+1] = {{ 0 }};
 
     if (fgets(str, sizeof(str), stdin) != NULL) {{
         size_t len = strlen(str);
