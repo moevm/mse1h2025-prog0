@@ -1,6 +1,6 @@
 import pytest
-from prog_questions import QuestionStringOperations
-from utility import moodleInit, CProgramRunner
+from prog_questions import QuestionStringOperations, utility
+from utility import moodleInit
 
 SEED_OPERATIONS = [
     "Перевести все гласные ['A', 'E', 'I', 'O', 'U', 'Y'] в верхний регистр",
@@ -80,7 +80,7 @@ class TestQuestionStringOperationsVariants:
             assert "main" not in self.question.preloadedCode
             assert "processString" in self.question.preloadedCode
         else:
-            CProgramRunner(self.question.preloadedCode)
+            utility.CProgramRunner(self.question.preloadedCode)
 
     def test_task_text(self):
         assert all(op in self.question.questionText for op in SEED_OPERATIONS)
