@@ -178,13 +178,9 @@ class QuestionStringOperations(QuestionBase):
                 generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(random_count)
             ]
 
-            for input_string in boundary_inputs:
-                result = self.test_case(runner, input_string, False)
-                if result != "OK":
-                    return result
-
-            for input_string in random_inputs:
-                result = self.test_case(runner, input_string)
+            all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
+            for input_string, use_noise in all_inputs:
+                result = self.test_case(runner, input_string, use_noise)
                 if result != "OK":
                     return result
 
