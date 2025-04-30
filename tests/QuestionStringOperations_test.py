@@ -8,9 +8,7 @@ SEED_OPERATIONS = [
     "Замените все цифры в строке остатками их деления на 2"
 ]
 
-
-def generate_code(wrapper='main'):
-    body = r'''
+SUCCESS_BODY = r'''
     char* symbol = str;
     while (*symbol) {
         if (strchr("aeiouy", *symbol)) *symbol -= 'a' - 'A';
@@ -43,8 +41,26 @@ def generate_code(wrapper='main'):
         if (strchr("0123456789", *symbol)) *symbol = ((*symbol - '0') % 2) + '0';
         symbol++;
     }
-    '''
-    if wrapper == 'main':
+'''
+
+RUNTIME_ERROR_BODY = r'''
+    int *ptr = NULL;
+    *ptr = 42;
+'''
+
+COMPILE_ERROR_BODY = r'''
+    innt i_am_error_variable = 0;
+'''
+
+
+def generate_code(is_simple_task, body):
+    if is_simple_task:
+        return f'''
+            void processString(char* str) {{
+                {body}
+            }}
+        '''
+    else:
         return f'''
         #include <stdio.h>
         #include <string.h>
@@ -58,26 +74,16 @@ def generate_code(wrapper='main'):
             return 0;
         }}
         '''
-    elif wrapper == 'processString':
-        return f'''
-        void processString(char* str) {{
-            {body}
-        }}
-        '''
 
 
-@pytest.mark.parametrize("params", [
-    (True, 'processString'),
-    (False, 'main')
-])
+@pytest.mark.parametrize("is_simple_task", [True, False])
 class TestQuestionStringOperationsVariants:
     @pytest.fixture(autouse=True)
-    def setup(self, request):
-        self.is_simple_task, self.wrapper = request.param
-        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=self.is_simple_task)
+    def setup(self, is_simple_task):
+        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=is_simple_task)
 
-    def test_code_preload(self):
-        if self.is_simple_task:
+    def test_code_preload(self, is_simple_task):
+        if is_simple_task:
             assert "main" not in self.question.preloadedCode
             assert "processString" in self.question.preloadedCode
         else:
@@ -86,43 +92,21 @@ class TestQuestionStringOperationsVariants:
     def test_task_text(self):
         assert all(op in self.question.questionText for op in SEED_OPERATIONS)
 
-    def test_code_success_run(self):
-        code = generate_code(wrapper=self.wrapper)
+    def test_code_success_run(self, is_simple_task):
+        code = generate_code(is_simple_task, SUCCESS_BODY)
         assert self.question.test(code) == 'OK'
 
-    def test_code_compile_error(self):
-        broken_code = '' if self.is_simple_task else '''
-            #include <stdio.h>
-
-            int main() {
-                retuurn 0;
-            }
-        '''
+    def test_code_compile_error(self, is_simple_task):
+        broken_code = generate_code(is_simple_task, COMPILE_ERROR_BODY)
         assert 'Ошибка компиляции' in self.question.test(broken_code)
 
-    def test_code_runtime_error(self):
-        runtime_error_code = (
-            r'''
-            void processString(char *str) {
-                int *ptr = NULL;
-                *ptr = 42;
-            }
-            ''' if self.is_simple_task else
-            r'''
-            #include <stdio.h>
-
-            int main() {
-                int *ptr = NULL;
-                *ptr = 42;
-                return 0;
-            }
-            '''
-        )
+    def test_code_runtime_error(self, is_simple_task):
+        runtime_error_code = generate_code(is_simple_task, RUNTIME_ERROR_BODY)
         assert 'Ошибка выполнения' in self.question.test(runtime_error_code)
 
-    def test_code_wrong_answer(self):
+    def test_code_wrong_answer(self, is_simple_task):
         wrong_code = (
-            self.question.preloadedCode if self.is_simple_task else
+            self.question.preloadedCode if is_simple_task else
             r'''
             #include <stdio.h>
 
