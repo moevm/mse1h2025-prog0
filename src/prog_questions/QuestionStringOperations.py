@@ -175,7 +175,7 @@ class QuestionStringOperations(QuestionBase):
 
             random_count = 20 + self.strictness * 30
             random_inputs = [
-                generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(random_count)
+                generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(int(random_count))
             ]
 
             all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
