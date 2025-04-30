@@ -66,17 +66,18 @@ def generate_code(wrapper='main'):
         '''
 
 
-@pytest.mark.parametrize("is_simple_task,wrapper", [
+@pytest.mark.parametrize("params", [
     (True, 'processString'),
     (False, 'main')
 ])
 class TestQuestionStringOperationsVariants:
     @pytest.fixture(autouse=True)
-    def setup(self, is_simple_task):
-        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=is_simple_task)
+    def setup(self, request):
+        self.is_simple_task, self.wrapper = request.param
+        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=self.is_simple_task)
 
-    def test_code_preload(self, is_simple_task):
-        if is_simple_task:
+    def test_code_preload(self):
+        if self.is_simple_task:
             assert "main" not in self.question.preloadedCode
             assert "processString" in self.question.preloadedCode
         else:
@@ -85,12 +86,12 @@ class TestQuestionStringOperationsVariants:
     def test_task_text(self):
         assert all(op in self.question.questionText for op in SEED_OPERATIONS)
 
-    def test_code_success_run(self, wrapper):
-        code = generate_code(wrapper=wrapper)
+    def test_code_success_run(self):
+        code = generate_code(wrapper=self.wrapper)
         assert self.question.test(code) == 'OK'
 
-    def test_code_compile_error(self, is_simple_task):
-        broken_code = '' if is_simple_task else '''
+    def test_code_compile_error(self):
+        broken_code = '' if self.is_simple_task else '''
             #include <stdio.h>
 
             int main() {
@@ -99,14 +100,14 @@ class TestQuestionStringOperationsVariants:
         '''
         assert 'Ошибка компиляции' in self.question.test(broken_code)
 
-    def test_code_runtime_error(self, is_simple_task):
+    def test_code_runtime_error(self):
         runtime_error_code = (
             r'''
             void processString(char *str) {
                 int *ptr = NULL;
                 *ptr = 42;
             }
-            ''' if is_simple_task else
+            ''' if self.is_simple_task else
             r'''
             #include <stdio.h>
 
@@ -119,9 +120,9 @@ class TestQuestionStringOperationsVariants:
         )
         assert 'Ошибка выполнения' in self.question.test(runtime_error_code)
 
-    def test_code_wrong_answer(self, is_simple_task):
+    def test_code_wrong_answer(self):
         wrong_code = (
-            self.question.preloadedCode if is_simple_task else
+            self.question.preloadedCode if self.is_simple_task else
             r'''
             #include <stdio.h>
 
