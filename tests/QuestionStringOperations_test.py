@@ -76,11 +76,19 @@ def generate_code(is_simple_task, body):
         '''
 
 
-@pytest.mark.parametrize("is_simple_task", [True, False])
+@pytest.mark.parametrize("is_simple_task,strictness", [
+    (True, 0),
+    (True, 0.5),
+    (True, 1),
+    (False, 0),
+    (False, 0.5),
+    (False, 1),
+])
 class TestQuestionStringOperationsVariants:
     @pytest.fixture(autouse=True)
-    def setup(self, is_simple_task):
-        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=is_simple_task)
+    def setup(self, is_simple_task, strictness):
+        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=is_simple_task,
+                                   strictness=strictness)
 
     def test_code_preload(self, is_simple_task):
         if is_simple_task:
