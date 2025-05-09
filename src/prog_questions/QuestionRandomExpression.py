@@ -10,12 +10,15 @@ int main() {
 }'''
 
 
+
+
+
 class QuestionRandomExpression(QuestionBase):
     questionName = "Вычисление выражения"
 
     def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=5,
                  minuses_threshold=0,
-                 brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0):
+                 brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0, is_simple_task=False):
         """
                 Конструктор класса QuestionRandomExpression.
 
@@ -32,7 +35,7 @@ class QuestionRandomExpression(QuestionBase):
         """
         super().__init__(seed=seed, vars=vars, operations=operations, length=length,
                          minuses_threshold=minuses_threshold,
-                         brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables, strictness=strictness)
+                         brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables, strictness=strictness, is_simple_task=is_simple_task)
         self.vars = vars
         self.operations = operations
         self.length = length
@@ -48,6 +51,7 @@ class QuestionRandomExpression(QuestionBase):
         self.min_space_number = 1
         self.max_space_number = 15
         self.space_amount = self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number)
+        self.is_simple_task = is_simple_task
 
     def generate_c_code(self):
         # Сортируем переменные в алфавитном порядке
@@ -78,8 +82,21 @@ class QuestionRandomExpression(QuestionBase):
         return c_code
 
     @property
+    def preloaded_code_for_simple_mode(self):
+        sorted_vars = sorted(self.vars)
+        vars_declaration = ", ".join(f"int {var}" for var in sorted_vars)
+        preloaded_code = (f"int random_expression({vars_declaration}) {{"
+                          f"\tresult = //тут напишите код, вычисляющий выражение из задания;"
+                          f"\treturn result;"
+                          f"}}")
+        return preloaded_code
+
+    @property
     def preloadedCode(self) -> str:
-        return PRELOADED_CODE
+        if self.is_simple_task:
+            return self.preloaded_code_for_simple_mode
+        else:
+            return PRELOADED_CODE
 
     @property
     def questionText(self) -> str:
