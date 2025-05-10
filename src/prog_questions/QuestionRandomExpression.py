@@ -60,16 +60,28 @@ class QuestionRandomExpression(QuestionBase):
         # Генерируем строки для кода
         vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
         vars_declaration_simple = ", ".join(f"int {var}" for var in sorted_vars)
+        vars_declaration_simple_calling = ", ".join(f"{var}" for var in sorted_vars)
         scanf_format = " ".join("%d" for _ in sorted_vars)  # Формат для scanf
         scanf_vars = ", ".join(f"&{var}" for var in sorted_vars)  # Указатели для scanf
 
         # Генерация выражения (пример)
         expression = self.questionExpression
         if self.is_simple_task:
-            c_code = (f"int random_expression({vars_declaration_simple}) {{\n"
-                          f"\tint result = {expression};\n"
-                          f"\treturn result;\n"
-                          f"}}")
+            c_code = f"""int random_expression({vars_declaration_simple}) {{\n
+                          \tint result = {expression};\n
+                          \treturn result;\n
+                          }}
+
+                          int main() {{
+                                {vars_declaration}
+                                if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+
+                                // Вычисление выражения
+                                int result = random_expression({vars_declaration_simple_calling});
+                                printf("%d", result);
+                                return 0;
+                          }}
+"""
         else:
         # Генерируем итоговый код
             c_code = f"""
