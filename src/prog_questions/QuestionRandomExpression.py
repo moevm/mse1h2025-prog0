@@ -283,7 +283,7 @@ int main() {{
 
         except CompilationError as e:
             if self.is_simple_task:
-                return f"Ошибка компиляции: {str(e)} код студента \n {code_c} \n\n эталонный код {code}"
+                return f"Ошибка компиляции: {str(e)}"
             else:
                 return f"Ошибка компиляции: {str(e)}"
 
