@@ -185,11 +185,9 @@ class QuestionRandomExpression(QuestionBase):
 
     def test(self, code: str) -> str:
         try:
-
             # крайний случай с пустым вводом
             if self.is_simple_task:
                 sorted_vars = sorted(self.vars)
-
                 # Генерируем строки для кода
                 vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
                 vars_declaration_simple = ", ".join(f"{var}" for var in sorted_vars)
@@ -272,7 +270,10 @@ int main() {{
             return "OK"
 
         except CompilationError as e:
-            return f"Ошибка компиляции: {str(e)}"
+            if self.is_simple_task:
+                return f"Ошибка компиляции: {str(e)} код {code_c}"
+            else:
+                return f"Ошибка компиляции: {str(e)}"
 
 
         except ExecutionError as e:
