@@ -100,40 +100,76 @@ class QuestionRandomExpression(QuestionBase):
 
     @property
     def questionText(self) -> str:
-        operations_list = ["+", "-", "*", "&", "|"]
-        operations_html = "\n".join(
-            f"<li><code>{op}</code></li>"
-            for op in operations_list
-        )
+        if self.is_simple_task:
+            operations_list = ["+", "-", "*", "&", "|"]
+            operations_html = "\n".join(
+                f"<li><code>{op}</code></li>"
+                for op in operations_list
+            )
 
-        return f"""
-            <h1>Условие задачи</h1>
-            <p>Напишите функцию, которая вычисляет значение следующего выражения:</p>
-            <pre>{self.questionExpression}</pre>
+            return f"""
+                            <h1>Условие задачи</h1>
+                            <p>Допишите функцию, которая вычисляет значение следующего выражения:</p>
+                            <pre>{self.questionExpression}</pre>
 
-            <h4>Формат ввода</h4>
-            <p>На вход через stdin подаются значения {len(self.vars)} переменных в алфавитном порядке ({' '.join(sorted(self.vars))}) через пробел.</p>
+                            <h4>Формат ввода</h4>
+                            <p>На вход в функцию подаются значения {len(self.vars)} переменных.</p>
 
-            <h4>Доступные операции</h4>
-            <ul>
-                {operations_html}
-            </ul>
+                            <h4>Доступные операции</h4>
+                            <ul>
+                                {operations_html}
+                            </ul>
 
-            <h4>Формат вывода</h4>
-            <p>Результат вычисления выражения должен быть выведен в stdout.</p>
+                            <h4>Формат вывода</h4>
+                            <p>Результат вычисления выражения возвращается.</p>
 
-            <h4>Пример</h4>
-            <table>
-                <tr>
-                    <th>Входные данные</th>
-                    <th>Выходные данные</th>
-                </tr>
-                <tr>
-                    <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
-                    <td><code>{self.testing_result}</code></td>
-                </tr>
-            </table>
-            """
+                            <h4>Пример</h4>
+                            <table>
+                                <tr>
+                                    <th>Входные данные</th>
+                                    <th>Выходные данные</th>
+                                </tr>
+                                <tr>
+                                    <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
+                                    <td><code>{self.testing_result}</code></td>
+                                </tr>
+                            </table>
+                            """
+        else:
+            operations_list = ["+", "-", "*", "&", "|"]
+            operations_html = "\n".join(
+                f"<li><code>{op}</code></li>"
+                for op in operations_list
+            )
+
+            return f"""
+                <h1>Условие задачи</h1>
+                <p>Напишите функцию, которая вычисляет значение следующего выражения:</p>
+                <pre>{self.questionExpression}</pre>
+
+                <h4>Формат ввода</h4>
+                <p>На вход через stdin подаются значения {len(self.vars)} переменных в алфавитном порядке ({' '.join(sorted(self.vars))}) через пробел.</p>
+
+                <h4>Доступные операции</h4>
+                <ul>
+                    {operations_html}
+                </ul>
+
+                <h4>Формат вывода</h4>
+                <p>Результат вычисления выражения должен быть выведен в stdout.</p>
+
+                <h4>Пример</h4>
+                <table>
+                    <tr>
+                        <th>Входные данные</th>
+                        <th>Выходные данные</th>
+                    </tr>
+                    <tr>
+                        <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
+                        <td><code>{self.testing_result}</code></td>
+                    </tr>
+                </table>
+                """
 
 
     @property
