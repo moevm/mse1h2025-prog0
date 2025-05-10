@@ -59,35 +59,41 @@ class QuestionRandomExpression(QuestionBase):
 
         # Генерируем строки для кода
         vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
+        vars_declaration_simple = ", ".join(f"int {var}" for var in sorted_vars)
         scanf_format = " ".join("%d" for _ in sorted_vars)  # Формат для scanf
         scanf_vars = ", ".join(f"&{var}" for var in sorted_vars)  # Указатели для scanf
 
         # Генерация выражения (пример)
         expression = self.questionExpression
-
+        if self.is_simple_task:
+            c_code = (f"int random_expression({vars_declaration_simple}) {{\n"
+                          f"\tint result = {expression};\n"
+                          f"\treturn result;\n"
+                          f"}}")
+        else:
         # Генерируем итоговый код
-        c_code = f"""
-    #include <stdio.h>
+            c_code = f"""
+        #include <stdio.h>
 
-    int main() {{
-        {vars_declaration}
-        if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+        int main() {{
+            {vars_declaration}
+            if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
 
-        // Вычисление выражения
-        int result = {expression};
-        printf("%d\\n", result);
-        return 0;
-    }}
-    """
+            // Вычисление выражения
+            int result = {expression};
+            printf("%d\\n", result);
+            return 0;
+        }}
+        """
         return c_code
 
     @property
     def preloaded_code_for_simple_mode(self):
         sorted_vars = sorted(self.vars)
         vars_declaration = ", ".join(f"int {var}" for var in sorted_vars)
-        preloaded_code = (f"int random_expression({vars_declaration}) {{"
-                          f"\tresult = //тут напишите код, вычисляющий выражение из задания;"
-                          f"\treturn result;"
+        preloaded_code = (f"int random_expression({vars_declaration}) {{\n"
+                          f"\tint result = //тут напишите код, вычисляющий выражение из задания;\n"
+                          f"\treturn result;\n"
                           f"}}")
         return preloaded_code
 
@@ -108,33 +114,33 @@ class QuestionRandomExpression(QuestionBase):
             )
 
             return f"""
-                            <h1>Условие задачи</h1>
-                            <p>Допишите функцию, которая вычисляет значение следующего выражения:</p>
-                            <pre>{self.questionExpression}</pre>
+<h1>Условие задачи</h1>
+<p>Допишите функцию, которая вычисляет значение следующего выражения:</p>
+<pre>{self.questionExpression}</pre>
 
-                            <h4>Формат ввода</h4>
-                            <p>На вход в функцию подаются значения {len(self.vars)} переменных.</p>
+            <h4>Формат ввода</h4>
+            <p>На вход в функцию подаются значения {len(self.vars)} переменных.</p>
 
-                            <h4>Доступные операции</h4>
-                            <ul>
-                                {operations_html}
-                            </ul>
+            <h4>Доступные операции</h4>
+            <ul>
+                {operations_html}
+            </ul>
 
-                            <h4>Формат вывода</h4>
-                            <p>Результат вычисления выражения возвращается.</p>
+            <h4>Формат вывода</h4>
+            <p>Результат вычисления выражения возвращается.</p>
 
-                            <h4>Пример</h4>
-                            <table>
-                                <tr>
-                                    <th>Входные данные</th>
-                                    <th>Выходные данные</th>
-                                </tr>
-                                <tr>
+            <h4>Пример</h4>
+                <table>
+            <tr>
+                <th>Входные данные</th>
+                <th>Выходные данные</th>
+            </tr>
+            <tr>
                                     <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
-                                    <td><code>{self.testing_result}</code></td>
-                                </tr>
-                            </table>
-                            """
+            <td><code>{self.testing_result}</code></td>
+        </tr>
+    </table>
+"""
         else:
             operations_list = ["+", "-", "*", "&", "|"]
             operations_html = "\n".join(
@@ -143,33 +149,33 @@ class QuestionRandomExpression(QuestionBase):
             )
 
             return f"""
-                <h1>Условие задачи</h1>
-                <p>Напишите функцию, которая вычисляет значение следующего выражения:</p>
-                <pre>{self.questionExpression}</pre>
+<h1>Условие задачи</h1>
+<p>Напишите функцию, которая вычисляет значение следующего выражения:</p>
+<pre>{self.questionExpression}</pre>
 
-                <h4>Формат ввода</h4>
-                <p>На вход через stdin подаются значения {len(self.vars)} переменных в алфавитном порядке ({' '.join(sorted(self.vars))}) через пробел.</p>
+<h4>Формат ввода</h4>
+<p>На вход через stdin подаются значения {len(self.vars)} переменных в алфавитном порядке ({' '.join(sorted(self.vars))}) через пробел.</p>
 
-                <h4>Доступные операции</h4>
-                <ul>
-                    {operations_html}
-                </ul>
+<h4>Доступные операции</h4>
+<ul>
+    {operations_html}
+</ul>
 
-                <h4>Формат вывода</h4>
-                <p>Результат вычисления выражения должен быть выведен в stdout.</p>
+<h4>Формат вывода</h4>
+<p>Результат вычисления выражения должен быть выведен в stdout.</p>
 
-                <h4>Пример</h4>
-                <table>
-                    <tr>
-                        <th>Входные данные</th>
-                        <th>Выходные данные</th>
-                    </tr>
-                    <tr>
-                        <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
-                        <td><code>{self.testing_result}</code></td>
-                    </tr>
-                </table>
-                """
+<h4>Пример</h4>
+    <table>
+        <tr>
+            <th>Входные данные</th>
+            <th>Выходные данные</th>
+        </tr>
+        <tr>
+            <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
+            <td><code>{self.testing_result}</code></td>
+        </tr>
+    </table>
+"""
 
 
     @property
@@ -181,7 +187,34 @@ class QuestionRandomExpression(QuestionBase):
         try:
 
             # крайний случай с пустым вводом
-            runner = CProgramRunner(code)
+            if self.is_simple_task:
+                sorted_vars = sorted(self.vars)
+
+                # Генерируем строки для кода
+                vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
+                vars_declaration_simple = ", ".join(f"{var}" for var in sorted_vars)
+                scanf_format = " ".join("%d" for _ in sorted_vars)  # Формат для scanf
+                scanf_vars = ", ".join(f"&{var}" for var in sorted_vars)  # Указатели для scanf
+                code_c = f"""
+#include <stdio.h>
+
+{code}
+int main() {{
+    {vars_declaration}
+    if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+
+    // Вычисление выражения
+    int result = random_expression({vars_declaration_simple});
+    printf("%d", result);
+    return 0;
+}}"""
+                print(code)
+
+                print('eee')
+                print(code_c)
+                runner = CProgramRunner(code_c)
+            else:
+                runner = CProgramRunner(code)
             general_runner = CProgramRunner(self.generate_c_code())
             output = runner.run('')
             general_output = general_runner.run('')
@@ -243,7 +276,7 @@ class QuestionRandomExpression(QuestionBase):
             return "OK"
 
         except CompilationError as e:
-            return "Ошибка компиляции"
+            return f"Ошибка компиляции"
 
 
         except ExecutionError as e:
