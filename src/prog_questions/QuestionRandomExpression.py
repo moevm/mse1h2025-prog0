@@ -81,7 +81,7 @@ class QuestionRandomExpression(QuestionBase):
 
             // Вычисление выражения
             int result = {expression};
-            printf("%d\\n", result);
+            printf("%d", result);
             return 0;
         }}
         """
