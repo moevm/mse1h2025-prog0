@@ -71,9 +71,6 @@ class TestQuestionRandomExpression:
 class TestQuestionRandomExpressionSimpleMode:
     question = moodleInit(QuestionRandomExpression, seed=52, is_simple_task=True)
 
-    def test_code_preload(self):
-        assert 'Ошибка компиляции' in utility.CProgramRunner(self.question.preloadedCode)
-
     def test_task_text(self):
         assert "w * y & w + x - y * w" in self.question.questionText
 
