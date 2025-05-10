@@ -208,10 +208,6 @@ int main() {{
     printf("%d", result);
     return 0;
 }}"""
-                print(code)
-
-                print('eee')
-                print(code_c)
                 runner = CProgramRunner(code_c)
             else:
                 runner = CProgramRunner(code)
@@ -276,7 +272,7 @@ int main() {{
             return "OK"
 
         except CompilationError as e:
-            return f"Ошибка компиляции"
+            return f"Ошибка компиляции: {str(e)}"
 
 
         except ExecutionError as e:
