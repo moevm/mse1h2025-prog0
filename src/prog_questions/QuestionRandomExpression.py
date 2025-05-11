@@ -50,7 +50,7 @@ class QuestionRandomExpression(QuestionBase):
         self.strictness = strictness
         self.min_space_number = 1
         self.max_space_number = 15
-        self.space_amount = self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number)
+        self.space_amount = int(self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number))
         self.is_simple_task = is_simple_task
 
     def generate_c_code(self):
@@ -162,7 +162,7 @@ class QuestionRandomExpression(QuestionBase):
 
             return f"""
 <h1>Условие задачи</h1>
-<p>Напишите функцию, которая вычисляет значение следующего выражения:</p>
+<p>Напишите пограмму, которая вычисляет значение следующего выражения:</p>
 <pre>{self.questionExpression}</pre>
 
 <h4>Формат ввода</h4>
@@ -272,7 +272,7 @@ int main() {{
 
             min_tests_number = 20
             max_tests_number = 50
-            tests_number = min_tests_number + self.strictness * (max_tests_number - min_tests_number)
+            tests_number = int(min_tests_number + self.strictness * (max_tests_number - min_tests_number))
             random.seed(self.seed)
             for i in range(tests_number):
                 general_output = general_runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
