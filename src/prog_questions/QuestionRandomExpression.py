@@ -18,7 +18,7 @@ class QuestionRandomExpression(QuestionBase):
 
     def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=5,
                  minuses_threshold=0,
-                 brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0, is_simple_task=False):
+                 brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0, is_simple_task=True):
         """
                 Конструктор класса QuestionRandomExpression.
 
