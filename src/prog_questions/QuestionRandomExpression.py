@@ -67,7 +67,9 @@ class QuestionRandomExpression(QuestionBase):
         # Генерация выражения (пример)
         expression = self.questionExpression
         if self.is_simple_task:
-            c_code = f"""int random_expression({vars_declaration_simple}) {{\n
+            c_code = f"""#include <stdio.h>
+
+            int random_expression({vars_declaration_simple}) {{\n
                           \tint result = {expression};\n
                           \treturn result;\n
                           }}
