@@ -76,7 +76,7 @@ class QuestionRandomExpression(QuestionBase):
 
                           int main() {{
                                 {vars_declaration}
-                                if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+                                if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 1;
 
                                 // Вычисление выражения
                                 int result = random_expression({vars_declaration_simple_calling});
@@ -91,7 +91,7 @@ class QuestionRandomExpression(QuestionBase):
 
         int main() {{
             {vars_declaration}
-            if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+            if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 1;
 
             // Вычисление выражения
             int result = {expression};
@@ -229,7 +229,7 @@ class QuestionRandomExpression(QuestionBase):
 {code}
 int main() {{
     {vars_declaration}
-    if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 0;
+    if (scanf("{scanf_format}", {scanf_vars}) != {len(sorted_vars)}) return 1;
 
     // Вычисление выражения
     int result = random_expression({vars_declaration_simple});

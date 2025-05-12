@@ -19,7 +19,7 @@ class TestQuestionRandomExpression:
 
             int main() {
                 int a, b, c, d;
-                if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
+                if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 1;
 
                 // w=a, x=b, y=c, z=d (алфавитный порядок)
                 int w = a, y = c, z = d, x = b;
@@ -40,7 +40,7 @@ class TestQuestionRandomExpression:
         int main() {
             int a, b, c, d
             // Пропущена точка с запятой
-            if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
+            if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 1;
 
             int result = w * y & w + x - y * w;
             printf("%d\n", result);
@@ -55,7 +55,7 @@ class TestQuestionRandomExpression:
 
         int main() {
             int a, b, c, d;
-            if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 0;
+            if (scanf("%d %d %d %d", &a, &b, &c, &d) != 4) return 1;
             int w = a, y = c, z = d, x = b;
             int result = w * (y & w) + x - y * w;
 
