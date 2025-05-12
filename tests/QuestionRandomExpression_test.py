@@ -48,7 +48,6 @@ class TestQuestionRandomExpression:
         '''
         assert "Ошибка компиляции" in self.question.test(code1)
 
-
     def test_incorrect_results(self):
         # Тест 1: Неправильный порядок операций
         code1 = r'''
@@ -75,25 +74,15 @@ class TestQuestionRandomExpressionSimpleMode:
         assert "w * y & w + x - y * w" in self.question.questionText
 
     def test_correct_solution(self):
-        try:
-            result = self.question.test(
-                r'''int random_expression(int w, int x, int y, int z) {
-    int result = w * y & w + x - y * w;
-    return result;
+        result = self.question.test(
+            r'''int random_expression(int w, int x, int y, int z) {
+int result = w * y & w + x - y * w;
+return result;
 }
-                '''
-            )
+            '''
+        )
 
-            assert result == 'OK', f"""Ожидалось OK, получено: {result}"""
-        except CompilationError as e:
-            print("Ошибка компиляции:")
-            print(str(e))
-            raise Exception(str(e))
-
-        except ExecutionError as e:
-            print(f"Ошибка выполнения [{e.exit_code}]: {str(e)}")
-
-
+        assert result == 'OK', f"""Ожидалось OK, получено: {result}"""
 
     def test_compilation_errors(self):
         # Тест 1: Неправильный синтаксис
@@ -105,7 +94,7 @@ int random_expression(int w int x, int y, int z) {
         '''
         assert "Ошибка компиляции" in self.question.test(code1)
 
-#
+    #
     def test_incorrect_results(self):
         # Тест 1: Неправильный порядок операций
         code1 = r'''
@@ -116,4 +105,3 @@ int random_expression(int w, int x, int y, int z) {
         '''
         res1 = self.question.test(code1)
         assert res1 != 'OK', "Ожидалась ошибка выполнения, но тест пройден"
-
