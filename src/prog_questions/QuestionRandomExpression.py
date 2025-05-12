@@ -144,15 +144,23 @@ class QuestionRandomExpression(QuestionBase):
             <p>Результат вычисления выражения возвращается.</p>
 
             <h4>Пример</h4>
-                <table>
+                <table border="1" width="100%">
+      <colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+        </colgroup>
+        <thead align="center">
             <tr>
                 <th>Входные данные</th>
                 <th>Выходные данные</th>
             </tr>
+        </thead>
+        <tbody>
             <tr>
-                                    <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
-            <td><code>{self.testing_result}</code></td>
-        </tr>
+                <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
+                <td><code>{self.testing_result}</code></td>
+            </tr>
+        </tbody>
     </table>
 """
         else:
@@ -179,15 +187,23 @@ class QuestionRandomExpression(QuestionBase):
 <p>Результат вычисления выражения должен быть выведен в stdout.</p>
 
 <h4>Пример</h4>
-    <table>
-        <tr>
-            <th>Входные данные</th>
-            <th>Выходные данные</th>
-        </tr>
-        <tr>
-            <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
-            <td><code>{self.testing_result}</code></td>
-        </tr>
+<table border="1" width="100%">
+      <colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+        </colgroup>
+        <thead align="center">
+            <tr>
+                <th>Входные данные</th>
+                <th>Выходные данные</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>{' '.join(str(v) for v in self.testing_values)}</code></td>
+                <td><code>{self.testing_result}</code></td>
+            </tr>
+        </tbody>
     </table>
 """
 
