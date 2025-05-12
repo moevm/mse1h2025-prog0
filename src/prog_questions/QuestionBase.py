@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from types import EllipsisType
 import sys
 import json
+from .utility import CommentMetric
 
 
 class QuestionBase(ABC):
@@ -14,15 +16,17 @@ class QuestionBase(ABC):
         self.parameters = parameters
 
     @classmethod
-    def initTemplate(cls, **parameters):
+    def initTemplate(cls, *, seed: int | EllipsisType | None = None, **parameters):
         '''
         Инициализация в параметрах шаблона Twig
+        seed - сид вопроса. Если равен None или Ellipsis, то берётся тот, что предоставляет Moodle.
         parameters - любые параметры, необходимые для настройки (сложность, въедливость и т.п.).
         Ввиду особенностей coderunner и простоты реализации, параметры могут быть типами,
         поддерживающимися JSON (int, float, str, bool, None, array, dict)
         '''
-        stdinData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
-        seed = int(stdinData['seed'])
+        if seed is None or seed is Ellipsis:
+            argvData = { parameter.split('=')[0]: parameter.split('=')[1] for parameter in sys.argv[1:] }
+            seed = int(argvData['seed'])
 
         return cls(seed=seed, **parameters)
 
@@ -70,3 +74,22 @@ class QuestionBase(ABC):
         Если всё хорошо - вернуть "OK"
         '''
         ...
+
+    def runTest(self, code: str) -> str:
+        '''
+        Запуск проверки кода и подсчёта процента коментариев в коде
+        code - код, отправленный студентом на проверку
+        Возвращаемое значение - JSON в виде строки для отображения результата шаблону-комбинатору
+        '''
+        result = self.test(code)
+        success = result == 'OK'
+        output = {
+            'fraction': 1.0 if success else 0.0,
+            'testresults': [['iscorrect', 'Тест', 'Ожидаемый', 'Получено', 'iscorrect'], [success, '#1', 'OK', result, success]],
+        }
+
+        if success:
+            commentsPercent = CommentMetric(code).get_comment_percentage()
+            output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
+
+        return json.dumps(output)

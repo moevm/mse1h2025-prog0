@@ -28,7 +28,7 @@
         <useace></useace>
         <resultcolumns></resultcolumns>
         <template></template>
-        <iscombinatortemplate>0</iscombinatortemplate>
+        <iscombinatortemplate/>
         <allowmultiplestdins></allowmultiplestdins>
         <answer></answer>
         <validateonsave>1</validateonsave>
@@ -36,7 +36,7 @@
         <language></language>
         <acelang>c</acelang>
         <sandbox></sandbox>
-        <grader></grader>
+        <grader>TemplateGrader</grader>
         <cputimelimitsecs></cputimelimitsecs>
         <memlimitmb></memlimitmb>
         <sandboxparams></sandboxparams>
