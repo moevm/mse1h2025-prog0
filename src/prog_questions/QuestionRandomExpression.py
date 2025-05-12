@@ -240,8 +240,6 @@ int main() {{
             else:
                 runner = CProgramRunner(code)
             general_runner = CProgramRunner(self.generate_c_code())
-            output = runner.run('')
-            general_output = general_runner.run('')
             # Список краевых случаев
             edge_cases = [
                 {
