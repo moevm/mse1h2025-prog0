@@ -20,6 +20,10 @@ class Result(ABC):
         got: str
 
 
+class CompileError(Exception):
+    pass
+
+
 class QuestionBase(ABC):
     questionName: str = ''
     '''
