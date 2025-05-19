@@ -391,16 +391,18 @@ class PrintSeedQuestion(QuestionBase):
 
 * `c_code` - исходный код на C в виде строки
 * Компилирует код в исполняемый файл и сохраняет путь к нему
+* *Исключения* - `CompilationError` если компиляция не удалась, `EnvironmentError` если произошла ошибка создания временной директории, `IternalError` если произошла внутренняя ошибка процесса компиляции
+
 
 - `_compile(self) -> str` - компилирует код в исполняемый файл
 * *Возвращаемое значение* - путь к скомпилированному исполняемому файлу
-* *Исключение* - `CompilationError` если компиляция не удалась
+* *Исключения* - `CompilationError` если компиляция не удалась, `IternalError` если произошла внутренняя ошибка процесса компиляции
 
 - `run(self, input_data: str = "", timeout: int = 60) -> str` - запускает скомпилированную программу с передачей входных данных
 * `input_data` - входные данные для программы (по умолчанию пустая строка)
 * `timeout` - максимальное время выполнения программы в секундах (по умолчанию 60 секунд)
 * *Возвращаемое значение* - вывод программы
-* *Исключение* - `ExecutionError` если выполнение программы завершилось с ошибкой
+* *Исключение* - `ExecutionError` если выполнение программы завершилось с ошибкой, `EnvironmentError` если отсутствует исполняемый файл, `InternalError` при внутренней ошибке процесса выполнения
 
 - `__del__(self)` - очищает временные файлы при удалении объекта
 
@@ -410,6 +412,11 @@ class PrintSeedQuestion(QuestionBase):
 - `ExecutionError` - исключение, вызываемое при ошибке выполнения скомпилированной программы
 * `message` - сообщение об ошибке
 * `exit_code` - код завершения программы
+
+- `EnvironmentError` - ошибка работы с файловой системой/ресурсами
+
+- `InternalError` - непредвиденная внутренняя ошибка работы класса
+
 
 ## Вспомогательный класс `ExitCodeHandler`:
 Класс для обработки кодов завершения и сигналов.
@@ -423,7 +430,7 @@ class PrintSeedQuestion(QuestionBase):
 
 ### Пример использования:
 ```python
-from CProgramRunner import CProgramRunner, CompilationError, ExecutionError
+from CProgramRunner import CProgramRunner, CompilationError, ExecutionError, EnvironmentError, InternalError
 
 C_CODE = """
 #include <stdio.h>
@@ -437,7 +444,6 @@ int main() {
 try:
     runner = CProgramRunner(C_CODE)
     output = runner.run()
-
     print("Программа успешно выполнена!")
     print("Вывод программы:", output)
 
@@ -448,8 +454,12 @@ except CompilationError as e:
 except ExecutionError as e:
     print(f"Ошибка выполнения [{e.exit_code}]: {str(e)}")
 
-except Exception as e:
-    print("Неожиданная ошибка:")
+except EnvironmentError as e:
+    print("Ошибка окружения:")
+    print(str(e))
+
+except InternalError as e:
+    print("Ошибка:")
     print(str(e))
 
 ```
