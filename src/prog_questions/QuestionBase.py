@@ -21,6 +21,9 @@ class Result(ABC):
 
 
 class CompileError(Exception):
+    '''
+    Общая ошибка компиляции
+    '''
     pass
 
 
