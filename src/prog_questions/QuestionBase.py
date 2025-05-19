@@ -132,7 +132,7 @@ class QuestionBase(ABC):
                 output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
             else:
                 output['prologuehtml'] = '<h1>Тесты не пройдены</h1>'
-                output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.got, result.expected, success]]
+                output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.expected, result.got, success]]
 
         except SyntaxError as e:
             output['prologuehtml'] = f'<h1>Ошибка синтаксиса</h1><code>{str(e)}</code>'
