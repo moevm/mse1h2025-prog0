@@ -11,13 +11,28 @@ from .utility import CommentMetric
 class Result(ABC):
     @dataclass(frozen=True)
     class Ok:
+        '''
+        Успешный результат запуска
+        '''
         pass
 
     @dataclass(frozen=True)
     class Fail:
+        '''
+        Тест-кейс не пройден во время запуска
+        '''
         input: str
+        '''
+        Входные данные
+        '''
         expected: str
+        '''
+        Ожидаемый вывод
+        '''
         got: str
+        '''
+        Полеченный вывод
+        '''
 
 
 class CompileError(Exception):
