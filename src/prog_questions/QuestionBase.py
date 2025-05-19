@@ -1,8 +1,23 @@
 from abc import ABC, abstractmethod
+from typing import final
+from dataclasses import dataclass
 from types import EllipsisType
 import sys
 import json
 from .utility import CommentMetric
+
+
+@final
+class Result(ABC):
+    @dataclass(frozen=True)
+    class Ok:
+        pass
+
+    @dataclass(frozen=True)
+    class Fail:
+        input: str
+        expected: str
+        got: str
 
 
 class QuestionBase(ABC):
