@@ -85,12 +85,12 @@ class QuestionBase(ABC):
         ...
 
     @abstractmethod
-    def test(self, code: str) -> str:
+    def test(self, code: str) -> Result.Ok | Result.Fail:
         '''
         Логика проверки кода
         code - код, отправленный студентом на проверку
-        Возвращаемое значение - строка-результат проверки, которую увидит студент.
-        Если всё хорошо - вернуть "OK"
+        Возвращаемое значение - Result.Ok - всё хорошо, Result.Fail - не прошёл тест-кейс
+        Вызывает исключения: SyntaxError, CompileError, RuntimeError
         '''
         ...
 
@@ -100,15 +100,33 @@ class QuestionBase(ABC):
         code - код, отправленный студентом на проверку
         Возвращаемое значение - JSON в виде строки для отображения результата шаблону-комбинатору
         '''
-        result = self.test(code)
-        success = result == 'OK'
-        output = {
-            'fraction': 1.0 if success else 0.0,
-            'testresults': [['iscorrect', 'Тест', 'Ожидаемый', 'Получено', 'iscorrect'], [success, '#1', 'OK', result, success]],
-        }
 
-        if success:
-            commentsPercent = CommentMetric(code).get_comment_percentage()
-            output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
+        success = False
+        output = {}
 
+        try:
+            result = self.test(code)
+            success = isinstance(result, Result.Ok)
+
+            if success:
+                output['prologuehtml'] = '<h1>Всё хорошо</h1>'
+                commentsPercent = CommentMetric(code).get_comment_percentage()
+                output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
+            else:
+                output['prologuehtml'] = '<h1>Тесты не пройдены</h1>'
+                output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.got, result.expected, success]]
+
+        except SyntaxError as e:
+            output['prologuehtml'] = f'<h1>Ошибка синтаксиса</h1><code>{str(e)}</code>'
+
+        except CompileError as e:
+            output['prologuehtml'] = f'<h1>Ошибка компиляции</h1><code>{str(e)}</code>'
+
+        except RuntimeError as e:
+            output['prologuehtml'] = f'<h1>Ошибка выполнения</h1><code>{str(e)}</code>'
+
+        except Exception:
+            output['prologuehtml'] = f'<h1>Ошибка задания</h1><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
+
+        output['fraction'] = 1.0 if success else 0.0
         return json.dumps(output)
