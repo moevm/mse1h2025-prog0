@@ -12,14 +12,15 @@ class Result(ABC):
     @dataclass(frozen=True)
     class Ok:
         '''
-        Успешный результат запуска
+        Успешный результат запуска проверки кода
         '''
         pass
 
     @dataclass(frozen=True)
     class Fail:
         '''
-        Тест-кейс не пройден во время запуска
+        Тест-кейс не пройден во время проверки кода.
+
         '''
         input: str
         '''
@@ -31,7 +32,7 @@ class Result(ABC):
         '''
         got: str
         '''
-        Полеченный вывод
+        Полученный вывод
         '''
 
 
@@ -127,24 +128,24 @@ class QuestionBase(ABC):
             success = isinstance(result, Result.Ok)
 
             if success:
-                output['prologuehtml'] = '<h1>Всё хорошо</h1>'
+                output['prologuehtml'] = '<h4>Всё хорошо</h4>'
                 commentsPercent = CommentMetric(code).get_comment_percentage()
                 output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
             else:
-                output['prologuehtml'] = '<h1>Тесты не пройдены</h1>'
+                output['prologuehtml'] = '<h4>Тесты не пройдены</h4>'
                 output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.expected, result.got, success]]
 
         except SyntaxError as e:
-            output['prologuehtml'] = f'<h1>Ошибка синтаксиса</h1><code>{str(e)}</code>'
+            output['prologuehtml'] = f'<h4>Ошибка синтаксиса</h4><p>{str(e)}</p>'
 
         except CompileError as e:
-            output['prologuehtml'] = f'<h1>Ошибка компиляции</h1><code>{str(e)}</code>'
+            output['prologuehtml'] = f'<h4>Ошибка компиляции</h4><p>{str(e)}</p>'
 
         except RuntimeError as e:
-            output['prologuehtml'] = f'<h1>Ошибка выполнения</h1><code>{str(e)}</code>'
+            output['prologuehtml'] = f'<h4>Ошибка выполнения</h4><p>{str(e)}</p>'
 
         except Exception:
-            output['prologuehtml'] = f'<h1>Ошибка задания</h1><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
+            output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
 
         output['fraction'] = 1.0 if success else 0.0
         return json.dumps(output)
