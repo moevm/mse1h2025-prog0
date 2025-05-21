@@ -102,7 +102,7 @@ class QuestionBase(ABC):
         Логика проверки кода
         code - код, отправленный студентом на проверку
         Возвращаемое значение - Result.Ok - всё хорошо, Result.Fail - не прошёл тест-кейс
-        Вызывает исключения: SyntaxError, CompileError
+        Вызывает исключения: CompilationError
         '''
         ...
 

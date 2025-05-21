@@ -107,10 +107,6 @@ print(question.getTemplateParameters())
 - `got: str`
   - Полученный вывод тест-кейса
 
-## Исключение `CompileError`
-
-Общая ошибка компиляции, которая может возникнуть при проверке кода (см. `QuestionBase.test`)
-
 ## Класс `QuestionBase` *(Абстрактный)*
 
 ### Методы класса
@@ -130,7 +126,7 @@ print(question.getTemplateParameters())
   - Логика проверки кода.
   - Параметры: Код студента (строка).
   - Возвращаемое значение: `Result.Ok` - тесты пройдены, `Result.Fail` - не прошёл тест-кейс.
-  - Вызывает исключения: `SyntaxError`, `CompileError`
+  - Вызывает исключения: `CompilationError`
 
 - `runTest(self, code: str) -> str`:
   - Запуск проверки кода и подсчёта процента коментариев в коде
@@ -151,8 +147,7 @@ print(question.getTemplateParameters())
 ### Пример реализации:
 ```python
 from .QuestionBase import QuestionBase, Result
-from io import StringIO
-from contextlib import redirect_stdout
+from .utility import CProgramRunner
 
 class PrintSeedQuestion(QuestionBase):
     questionName: str = 'Печать случайного seed'
@@ -166,11 +161,13 @@ class PrintSeedQuestion(QuestionBase):
         return f'# TODO: напечатать {self.seed}'
 
     def test(self, code: str) -> Result.Ok | Result.Fail:
-        with StringIO() as f, redirect_stdout(f):
-            eval(code)
-            result = f.getvalue()
+        program = CProgramRunner(code)
 
-        result = result.strip()
+        try:
+            result = program.run()
+        except Exception as e:
+            return Result.Fail('', f'{self.seed}', str(e));
+
         if result != f'{self.seed}':
             return Result.Fail('', f'{self.seed}', result)
 
