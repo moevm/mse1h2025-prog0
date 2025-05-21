@@ -88,6 +88,29 @@ print(question.getTemplateParameters())
 
 # Документация
 
+## Датакласс `Result.Ok`
+
+Успешный результат запуска проверки кода. Поля отсутствуют
+
+## Датакалсс `Result.Fail`
+
+Тест-кейс не пройден во время проверки кода.
+
+### Поля датакласса:
+
+- `input: str`
+  - Входные данные тест-кейса
+
+- `expected: str`
+  - Ожидаемый вывод тест-кейса
+
+- `got: str`
+  - Полученный вывод тест-кейса
+
+## Исключение `CompileError`
+
+Общая ошибка компиляции, которая может возникнуть при проверке кода (см. `QuestionBase.test`)
+
 ## Класс `QuestionBase` *(Абстрактный)*
 
 ### Методы класса
@@ -103,10 +126,11 @@ print(question.getTemplateParameters())
 - `getTemplateParameters(self) -> str`:
   - Возвращает параметры в формате JSON для шаблонизатора Twig.
 
-- `test(self, code: str) -> str`:
+- `test(self, code: str) -> Result.Ok | Result.Fail`:
   - Логика проверки кода.
   - Параметры: Код студента (строка).
-  - Возвращаемое значение: Результат проверки (строка).
+  - Возвращаемое значение: `Result.Ok` - тесты пройдены, `Result.Fail` - не прошёл тест-кейс.
+  - Вызывает исключения: `SyntaxError`, `CompileError`, `RuntimeError`
 
 - `runTest(self, code: str) -> str`:
   - Запуск проверки кода и подсчёта процента коментариев в коде
@@ -126,14 +150,12 @@ print(question.getTemplateParameters())
 
 ### Пример реализации:
 ```python
-from .QuestionBase import QuestionBase
+from .QuestionBase import QuestionBase, Result
 from io import StringIO
 from contextlib import redirect_stdout
 
 class PrintSeedQuestion(QuestionBase):
-    @property
-    def questionName(self) -> str:
-        return 'Печать случайного seed'
+    questionName: str = 'Печать случайного seed'
 
     @property
     def questionText(self) -> str:
@@ -143,19 +165,16 @@ class PrintSeedQuestion(QuestionBase):
     def preloadedCode(self) -> str:
         return f'# TODO: напечатать {self.seed}'
 
-    def test(self, code: str) -> str:
+    def test(self, code: str) -> Result.Ok | Result.Fail:
         with StringIO() as f, redirect_stdout(f):
-            try:
-                eval(code)
-            except Exception as e:
-                return str(e)
-
+            eval(code)
             result = f.getvalue()
 
-        if result.strip() != f'{self.seed}':
-            return 'Wrong answer'
+        result = result.strip()
+        if result != f'{self.seed}':
+            return Result.Fail('', f'{self.seed}', result)
 
-        return 'OK'
+        return Result.Ok()
 
 ```
 
