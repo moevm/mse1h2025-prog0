@@ -158,7 +158,7 @@ class PrintSeedQuestion(QuestionBase):
 
     @property
     def preloadedCode(self) -> str:
-        return f'# TODO: напечатать {self.seed}'
+        return f'// TODO: напечатать {self.seed}'
 
     def test(self, code: str) -> Result.Ok | Result.Fail:
         program = CProgramRunner(code)
