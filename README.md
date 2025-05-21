@@ -130,7 +130,7 @@ print(question.getTemplateParameters())
   - Логика проверки кода.
   - Параметры: Код студента (строка).
   - Возвращаемое значение: `Result.Ok` - тесты пройдены, `Result.Fail` - не прошёл тест-кейс.
-  - Вызывает исключения: `SyntaxError`, `CompileError`, `RuntimeError`
+  - Вызывает исключения: `SyntaxError`, `CompileError`
 
 - `runTest(self, code: str) -> str`:
   - Запуск проверки кода и подсчёта процента коментариев в коде

@@ -109,7 +109,7 @@ class QuestionBase(ABC):
         Логика проверки кода
         code - код, отправленный студентом на проверку
         Возвращаемое значение - Result.Ok - всё хорошо, Result.Fail - не прошёл тест-кейс
-        Вызывает исключения: SyntaxError, CompileError, RuntimeError
+        Вызывает исключения: SyntaxError, CompileError
         '''
         ...
 
@@ -140,9 +140,6 @@ class QuestionBase(ABC):
 
         except CompileError as e:
             output['prologuehtml'] = f'<h4>Ошибка компиляции</h4><p>{str(e)}</p>'
-
-        except RuntimeError as e:
-            output['prologuehtml'] = f'<h4>Ошибка выполнения</h4><p>{str(e)}</p>'
 
         except Exception:
             output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
