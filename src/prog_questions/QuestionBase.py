@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from types import EllipsisType
 import sys
 import json
-from .utility import CommentMetric
+from .utility import CommentMetric, CompilationError
 
 
 @final
@@ -34,13 +34,6 @@ class Result(ABC):
         '''
         Полученный вывод
         '''
-
-
-class CompileError(Exception):
-    '''
-    Общая ошибка компиляции
-    '''
-    pass
 
 
 class QuestionBase(ABC):
@@ -135,10 +128,7 @@ class QuestionBase(ABC):
                 output['prologuehtml'] = '<h4>Тесты не пройдены</h4>'
                 output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.expected, result.got, success]]
 
-        except SyntaxError as e:
-            output['prologuehtml'] = f'<h4>Ошибка синтаксиса</h4><p>{str(e)}</p>'
-
-        except CompileError as e:
+        except CompilationError as e:
             output['prologuehtml'] = f'<h4>Ошибка компиляции</h4><p>{str(e)}</p>'
 
         except Exception:
