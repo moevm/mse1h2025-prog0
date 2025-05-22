@@ -87,8 +87,8 @@ class CProgramRunner:
             self.executable_path = self._compile()
         except CompilationError:
             raise
-        except Exception as e:
-            raise InternalError(f"Внутренняя ошибка при компиляции: {e}")
+        except InternalError:
+            raise
 
     def _compile(self) -> str:
         """Компиляция кода в исполняемый файл, возвращает путь к исполняемому файлу"""
