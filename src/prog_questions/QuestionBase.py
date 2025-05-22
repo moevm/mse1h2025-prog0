@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from types import EllipsisType
 import sys
 import json
-from .utility import CommentMetric, CompilationError
+from .utility import CommentMetric, CompilationError, EnvironmentError, InternalError
 
 
 @final
@@ -130,6 +130,9 @@ class QuestionBase(ABC):
 
         except CompilationError as e:
             output['prologuehtml'] = f'<h4>Ошибка компиляции</h4><p>{str(e)}</p>'
+
+        except (InternalError, EnvironmentError) as e:
+            output['prologuehtml'] = f'<h4>Ошибка сервера (попробуйте позже)</h4><p>{str(e)}</p>'
 
         except Exception:
             output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
