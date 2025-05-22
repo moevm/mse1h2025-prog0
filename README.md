@@ -126,7 +126,7 @@ print(question.getTemplateParameters())
   - Логика проверки кода.
   - Параметры: Код студента (строка).
   - Возвращаемое значение: `Result.Ok` - тесты пройдены, `Result.Fail` - не прошёл тест-кейс.
-  - Вызывает исключения: `CompilationError`
+  - Вызывает исключения: `CompilationError`, `InternalError`, `EnvironmentError`
 
 - `runTest(self, code: str) -> str`:
   - Запуск проверки кода и подсчёта процента коментариев в коде
@@ -147,7 +147,7 @@ print(question.getTemplateParameters())
 ### Пример реализации:
 ```python
 from .QuestionBase import QuestionBase, Result
-from .utility import CProgramRunner
+from .utility import CProgramRunner, ExecutionError
 
 class PrintSeedQuestion(QuestionBase):
     questionName: str = 'Печать случайного seed'
@@ -165,7 +165,7 @@ class PrintSeedQuestion(QuestionBase):
 
         try:
             result = program.run()
-        except Exception as e:
+        except ExecutionError as e:
             return Result.Fail('', f'{self.seed}', str(e));
 
         if result != f'{self.seed}':
