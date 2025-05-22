@@ -1,5 +1,5 @@
-from .QuestionBase import QuestionBase
-from .utility import CProgramRunner, ExecutionError, CompilationError
+from .QuestionBase import QuestionBase, Result
+from .utility import CProgramRunner, ExecutionError
 from riscv_course.random_expressions.random_expressions import get_expression
 import random
 
@@ -10,13 +10,10 @@ int main() {
 }'''
 
 
-
-
-
 class QuestionRandomExpression(QuestionBase):
     questionName = "Вычисление выражения"
 
-    def __init__(self, *, seed: int, vars=['x','y','z','w'], operations=['+','-','*','&','|'], length=5,
+    def __init__(self, *, seed: int, vars=['x', 'y', 'z', 'w'], operations=['+', '-', '*', '&', '|'], length=5,
                  minuses_threshold=0,
                  brackets_treshold=0, minus_symbol="-", all_variables=False, strictness=0, is_simple_task=True):
         """
@@ -35,7 +32,8 @@ class QuestionRandomExpression(QuestionBase):
         """
         super().__init__(seed=seed, vars=vars, operations=operations, length=length,
                          minuses_threshold=minuses_threshold,
-                         brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables, strictness=strictness, is_simple_task=is_simple_task)
+                         brackets_treshold=brackets_treshold, minus_symbol=minus_symbol, all_variables=all_variables,
+                         strictness=strictness, is_simple_task=is_simple_task)
         self.vars = vars
         self.operations = operations
         self.length = length
@@ -45,12 +43,13 @@ class QuestionRandomExpression(QuestionBase):
         self.all_variables = all_variables
         random.seed(self.seed)
         self.testing_values = [random.randint(0, 100) for _ in self.vars]
-        self.testing_vars = {key:value for key, value in zip(self.vars, self.testing_values)}
+        self.testing_vars = {key: value for key, value in zip(self.vars, self.testing_values)}
         self.testing_result = eval(self.questionExpression, self.testing_vars)
         self.strictness = strictness
         self.min_space_number = 1
         self.max_space_number = 15
-        self.space_amount = int(self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number))
+        self.space_amount = int(
+            self.min_space_number + self.strictness * (self.max_space_number - self.min_space_number))
         self.is_simple_task = is_simple_task
 
     def generate_c_code(self):
@@ -85,7 +84,7 @@ class QuestionRandomExpression(QuestionBase):
                           }}
 """
         else:
-        # Генерируем итоговый код
+            # Генерируем итоговый код
             c_code = f"""
         #include <stdio.h>
 
@@ -207,23 +206,22 @@ class QuestionRandomExpression(QuestionBase):
     </table>
 """
 
-
     @property
     def questionExpression(self) -> str:
         return get_expression(self.vars, self.operations, self.length, self.seed, self.minuses_threshold,
                               self.brackets_treshold, self.minus_symbol, self.all_variables)
 
     def test(self, code: str) -> str:
-        try:
-            # крайний случай с пустым вводом
-            if self.is_simple_task:
-                sorted_vars = sorted(self.vars)
-                # Генерируем строки для кода
-                vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
-                vars_declaration_simple = ", ".join(f"{var}" for var in sorted_vars)
-                scanf_format = " ".join("%d" for _ in sorted_vars)  # Формат для scanf
-                scanf_vars = ", ".join(f"&{var}" for var in sorted_vars)  # Указатели для scanf
-                code_c = f"""
+
+        # крайний случай с пустым вводом
+        if self.is_simple_task:
+            sorted_vars = sorted(self.vars)
+            # Генерируем строки для кода
+            vars_declaration = 'int ' + ", ".join(f"{var}" for var in sorted_vars) + ';'  # Объявление переменных
+            vars_declaration_simple = ", ".join(f"{var}" for var in sorted_vars)
+            scanf_format = " ".join("%d" for _ in sorted_vars)  # Формат для scanf
+            scanf_vars = ", ".join(f"&{var}" for var in sorted_vars)  # Указатели для scanf
+            code_c = f"""
 #include <stdio.h>
 
 {code}
@@ -236,77 +234,61 @@ int main() {{
     printf("%d", result);
     return 0;
 }}"""
-                runner = CProgramRunner(code_c)
-            else:
-                runner = CProgramRunner(code)
-            general_runner = CProgramRunner(self.generate_c_code())
-            # Список краевых случаев
-            edge_cases = [
-                {
-                    'name': 'все нули',
-                    'values': [0] * len(self.vars)
-                },
-                {
-                    'name': 'все единицы',
-                    'values': [1] * len(self.vars)
-                },
-                {
-                    'name': 'отрицательные значения',
-                    'values': [-1 * (i + 1) for i in range(len(self.vars))]
-                },
-                {
-                    'name': 'чередование знаков',
-                    'values': [(-1) ** i * i for i in range(len(self.vars))]
-                },
-                {
-                    'name': 'большие числа',
-                    'values': [10 ** 9] * len(self.vars)
-                }
-            ]
+            runner = CProgramRunner(code_c)
+        else:
+            runner = CProgramRunner(code)
+        general_runner = CProgramRunner(self.generate_c_code())
+        # Список краевых случаев
+        edge_cases = [
+            {
+                'name': 'все нули',
+                'values': [0] * len(self.vars)
+            },
+            {
+                'name': 'все единицы',
+                'values': [1] * len(self.vars)
+            },
+            {
+                'name': 'отрицательные значения',
+                'values': [-1 * (i + 1) for i in range(len(self.vars))]
+            },
+            {
+                'name': 'чередование знаков',
+                'values': [(-1) ** i * i for i in range(len(self.vars))]
+            },
+            {
+                'name': 'большие числа',
+                'values': [10 ** 9] * len(self.vars)
+            }
+        ]
 
-            # Проверка краевых случаев
-            for case in edge_cases:
-                values = case['values']
-                input_data = case.get('input_data', (' ' * self.space_amount).join(map(str, values)))
+        # Проверка краевых случаев
+        for case in edge_cases:
+            values = case['values']
+            input_data = case.get('input_data', (' ' * self.space_amount).join(map(str, values)))
 
-                try:
-                    general_output = general_runner.run(input_data)
-                    output = runner.run(input_data)
+            try:
+                general_output = general_runner.run(input_data)
+                output = runner.run(input_data)
 
-                    if output != general_output:
-                        return (
-                            f"Краевой случай '{case['name']}': Ошибка\n"
-                            f"Вход: {input_data}\n"
-                            f"Ожидалось: {general_output}\n"
-                            f"Получено: {output}"
-                        )
-                except ExecutionError as e:
-                    return f"Ошибка выполнения в тесте '{case['name']}': {str(e)}"
-
-            if output != general_output:
-                return f"Тест пройден с ошибкой"
-
-            min_tests_number = 20
-            max_tests_number = 50
-            tests_number = int(min_tests_number + self.strictness * (max_tests_number - min_tests_number))
-            random.seed(self.seed)
-            for i in range(tests_number):
-                general_output = general_runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
-                output = runner.run(input_data=(' '*self.space_amount).join(str(value) for value in self.testing_values))
                 if output != general_output:
-                    return f"Тест {i + 1} из {tests_number} пройден с ошибкой. Ожидалось: {general_output}, Ваш ответ: {output}"
-            return "OK"
+                    return Result.Fail(input_data, general_output, output)
+            except ExecutionError as e:
+                return Result.Fail(input_data, general_output, str(e))
 
-        except CompilationError as e:
-            if self.is_simple_task:
-                return f"Ошибка компиляции: {str(e)}"
-            else:
-                return f"Ошибка компиляции: {str(e)}"
+        min_tests_number = 20
+        max_tests_number = 50
+        tests_number = int(min_tests_number + self.strictness * (max_tests_number - min_tests_number))
+        random.seed(self.seed)
 
-
-        except ExecutionError as e:
-            return f"Ошибка выполнения [{e.exit_code}]: {str(e)}"
-
-        except Exception as e:
-            return f"Неожиданная ошибка:{str(e)}"
-
+        for i in range(tests_number):
+            try:
+                general_output = general_runner.run(
+                    input_data=(' ' * self.space_amount).join(str(value) for value in self.testing_values))
+                output = runner.run(
+                    input_data=(' ' * self.space_amount).join(str(value) for value in self.testing_values))
+                if output != general_output:
+                    return Result.Fail(input_data, general_output, output)
+            except ExecutionError as e:
+                return Result.Fail(input_data, general_output, str(e))
+        return Result.Ok()
