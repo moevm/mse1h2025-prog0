@@ -102,7 +102,7 @@ class CProgramRunner:
                 ['gcc', src_path, '-o', exec_path],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                timeout=60
+                timeout=3
             )
 
             if compile_result.returncode != 0:
@@ -116,7 +116,7 @@ class CProgramRunner:
         except Exception as e:
             raise InternalError(f"Внутренняя ошибка при компиляции: {e}")
 
-    def run(self, input_data: str = "", timeout: int = 60) -> str:
+    def run(self, input_data: str = "", timeout: int = 3) -> str:
         """
         Запуск скомпилированной программы
         :param input_data: Входные данные для программы
