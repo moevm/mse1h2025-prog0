@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from types import EllipsisType
 import sys
 import json
-from .utility import CommentMetric
+from .utility import CommentMetric, CompilationError, EnvironmentError, InternalError
 
 
 @final
@@ -34,13 +34,6 @@ class Result(ABC):
         '''
         Полученный вывод
         '''
-
-
-class CompileError(Exception):
-    '''
-    Общая ошибка компиляции
-    '''
-    pass
 
 
 class QuestionBase(ABC):
@@ -109,7 +102,7 @@ class QuestionBase(ABC):
         Логика проверки кода
         code - код, отправленный студентом на проверку
         Возвращаемое значение - Result.Ok - всё хорошо, Result.Fail - не прошёл тест-кейс
-        Вызывает исключения: SyntaxError, CompileError
+        Вызывает исключения: CompilationError
         '''
         ...
 
@@ -125,7 +118,7 @@ class QuestionBase(ABC):
 
         try:
             result = self.test(code)
-            success = isinstance(result, Result.Ok)
+            success = result == Result.Ok()
 
             if success:
                 output['prologuehtml'] = '<h4>Всё хорошо</h4>'
@@ -135,11 +128,11 @@ class QuestionBase(ABC):
                 output['prologuehtml'] = '<h4>Тесты не пройдены</h4>'
                 output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.expected, result.got, success]]
 
-        except SyntaxError as e:
-            output['prologuehtml'] = f'<h4>Ошибка синтаксиса</h4><p>{str(e)}</p>'
-
-        except CompileError as e:
+        except CompilationError as e:
             output['prologuehtml'] = f'<h4>Ошибка компиляции</h4><p>{str(e)}</p>'
+
+        except (InternalError, EnvironmentError) as e:
+            output['prologuehtml'] = f'<h4>Ошибка сервера (попробуйте позже)</h4><p>{str(e)}</p>'
 
         except Exception:
             output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'

@@ -101,8 +101,7 @@ class CProgramRunner:
             compile_result = subprocess.run(
                 ['gcc', src_path, '-o', exec_path],
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                timeout=3
+                stderr=subprocess.PIPE
             )
 
             if compile_result.returncode != 0:
@@ -146,6 +145,8 @@ class CProgramRunner:
 
             return output.strip()
 
+        except subprocess.TimeoutExpired:
+            raise ExecutionError(f"Превышено время выполнения ({timeout} с)", 1)
         except ExecutionError:
             raise
         except Exception as e:
