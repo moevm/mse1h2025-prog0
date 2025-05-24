@@ -1,5 +1,6 @@
 import pytest
 from prog_questions import QuestionStringOperations, utility, Result
+from prog_questions.utility import CompilationError, ExecutionError
 from utility import moodleInit
 
 SEED_OPERATIONS = [
