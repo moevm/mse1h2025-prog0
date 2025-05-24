@@ -113,7 +113,7 @@ class TestQuestionStringOperationsVariants:
 
     def test_code_runtime_error(self, is_simple_task):
         runtime_error_code = generate_code(is_simple_task, RUNTIME_ERROR_BODY)
-        assert self.question.test(runtime_error_code) != Result.Ok
+        assert self.question.test(runtime_error_code) != Result.Ok()
 
     def test_code_wrong_answer(self, is_simple_task):
         wrong_code = (
