@@ -215,7 +215,7 @@ class QuestionRandomCondition(QuestionBase):
             runner = CProgramRunner(code)
             output = runner.run(input)
         except ExecutionError as e:
-            return Result.Fail(input, expected_output, output)
+            return Result.Fail(input, expected_output, str(e))
 
         if output == expected_output:
             return Result.Ok()
