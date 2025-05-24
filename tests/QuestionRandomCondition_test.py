@@ -1,6 +1,7 @@
-from prog_questions import QuestionRandomCondition, utility
+import pytest
+from prog_questions import QuestionRandomCondition, utility, Result
+from prog_questions.utility import CompilationError, ExecutionError
 from utility import moodleInit
-
 
 class TestQuestionRandomCondition:
     question = moodleInit(QuestionRandomCondition, seed=52, is_simple_task=False)
@@ -45,10 +46,11 @@ class TestQuestionRandomCondition:
             }
 
             '''
-        ) == 'OK'
+        ) == Result.Ok()
 
     def test_code_compile_error(self):
-        assert 'Ошибка компиляции' in self.question.test(
+        with pytest.raises(CompilationError):
+            self.question.test(
             r'''
             #include <stdio.h>
 
@@ -82,7 +84,7 @@ class TestQuestionRandomCondition:
         )
 
     def test_code_runtime_error(self):
-        assert 'Ошибка выполнения' in self.question.test(
+        assert self.question.test(
             r'''
             #include <stdio.h>
 
@@ -113,10 +115,10 @@ class TestQuestionRandomCondition:
             }
 
             '''
-        )
+        ) != Result.Ok()
 
     def test_code_wrong_answer(self):
-        assert 'Ошибка: ожидалось' in self.question.test(
+        assert self.question.test(
             r'''
             #include <stdio.h>
 
@@ -147,7 +149,7 @@ class TestQuestionRandomCondition:
             }
 
             '''
-        )
+        ) != Result.Ok()
 
 
 class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
@@ -172,10 +174,11 @@ class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
                 }
             }
             '''
-        ) == 'OK'
+        ) == Result.Ok()
 
     def test_code_compile_error(self):
-        assert 'Ошибка компиляции' in self.question.test(
+        with pytest.raises(CompilationError):
+            self.question.test(
             r'''
             void random_condition_solver(long long *arr, size_t arr_length) {
                 for (int i = 0; i < arr_length; i++) {
@@ -193,7 +196,7 @@ class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
         )
 
     def test_code_runtime_error(self):
-        assert 'Ошибка выполнения' in self.question.test(
+        assert self.question.test(
             r'''
             void random_condition_solver(long long *arr, size_t arr_length) {
                 for (int i = 0; i < arr_length; i++) {
@@ -208,10 +211,10 @@ class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
                 }
             }
             '''
-        )
+        ) != Result.Ok()
 
     def test_code_wrong_answer(self):
-        assert 'Ошибка: ожидалось' in self.question.test(
+        assert self.question.test(
             r'''
             void random_condition_solver(long long *arr, size_t arr_length) {
                 for (int i = 0; i < arr_length; i++) {
@@ -226,4 +229,4 @@ class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
                 }
             }
             '''
-        )
+        ) != Result.Ok()
