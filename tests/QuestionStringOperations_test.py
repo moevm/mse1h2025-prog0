@@ -89,7 +89,7 @@ def generate_code(is_simple_task, body):
 class TestQuestionStringOperationsVariants:
     @pytest.fixture(autouse=True)
     def setup(self, is_simple_task, strictness):
-        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=is_simple_task, strictness=strictness)
+        self.question = moodleInit(QuestionStringOperations, num_operations=3, seed=52, is_simple_task=is_simple_task, strictness=strictness)
 
     def test_code_preload(self, is_simple_task):
         if is_simple_task:
