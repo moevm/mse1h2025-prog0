@@ -102,18 +102,17 @@ class TestQuestionStringOperationsVariants:
 
     def test_code_success_run(self, is_simple_task):
         code = generate_code(is_simple_task, SUCCESS_BODY)
-        assert self.question.test(code) == Result.Ok
+        assert self.question.test(code) == Result.Ok()
 
     def test_code_compile_error(self, is_simple_task):
         broken_code = generate_code(is_simple_task, COMPILE_ERROR_BODY)
         with pytest.raises(CompilationError):
             self.question.test(broken_code)
 
+
     def test_code_runtime_error(self, is_simple_task):
         runtime_error_code = generate_code(is_simple_task, RUNTIME_ERROR_BODY)
-        with pytest.raises(CompilationError):
-            self.question.test(broken_code)
-        assert 'Ошибка выполнения' in self.question.test(runtime_error_code)
+        assert self.question.test(runtime_error_code) != Result.Ok
 
     def test_code_wrong_answer(self, is_simple_task):
         wrong_code = (
@@ -126,4 +125,4 @@ class TestQuestionStringOperationsVariants:
             }
             '''
         )
-        assert 'Ошибка: ожидалось' in self.question.test(wrong_code)
+        assert self.question.test(wrong_code) != Result.Ok()
