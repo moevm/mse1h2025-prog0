@@ -219,7 +219,7 @@ class QuestionRandomCondition(QuestionBase):
             else:
                 return Result.Fail(input, expected_output, output)
         except ExecutionError as e:
-            return Result.Fail(input, expected_output, f"Ошибка выполнения (код {e.exit_code}): {e}")
+            return Result.Fail(input, expected_output, output)
 
     # form test: same numbers
     def test_same_numbers_case(self, code: str, amount: int, exponentiation: int) -> str:
