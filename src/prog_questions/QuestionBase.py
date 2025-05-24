@@ -134,8 +134,8 @@ class QuestionBase(ABC):
         except (InternalError, EnvironmentError) as e:
             output['prologuehtml'] = f'<h4>Ошибка сервера (попробуйте позже)</h4><p style="font-family: monospace;">{str(e)}</p>'
 
-        except Exception as e:
-            output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p><p>{str(e)}</p>'
+        except Exception:
+            output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
 
         output['fraction'] = 1.0 if success else 0.0
         return json.dumps(output)
