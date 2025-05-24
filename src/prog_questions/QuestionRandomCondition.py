@@ -214,11 +214,12 @@ class QuestionRandomCondition(QuestionBase):
         try:
             runner = CProgramRunner(code)
             output = runner.run(input)
-            if output == expected_output:
-                return Result.Ok()
-            else:
-                return Result.Fail(input, expected_output, output)
         except ExecutionError as e:
+            return Result.Fail(input, expected_output, output)
+
+        if output == expected_output:
+            return Result.Ok()
+        else:
             return Result.Fail(input, expected_output, output)
 
     # form test: same numbers
