@@ -157,8 +157,15 @@ class QuestionStringOperations(QuestionBase):
     def test_case(self, runner: CProgramRunner, input_string: str, noise: bool = True):
         if noise:
             input_string = self.noise_input_string(input_string)
-        output = runner.run(input_string)
+
         expected_output = apply_operations(input_string, self.operations)
+
+        try:
+            output = runner.run(input_string)
+        except ExecutionError as e:
+            return Result.Fail(input_string, expected_output, str(e))
+
+
         if output == expected_output:
             return Result.Ok()
         else:
@@ -183,6 +190,7 @@ class QuestionStringOperations(QuestionBase):
         ]
 
         all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
+
         for input_string, use_noise in all_inputs:
             result = self.test_case(runner, input_string, use_noise)
             if result != Result.Ok():
