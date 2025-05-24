@@ -82,7 +82,7 @@ def get_operation_html_description(operations):
 class QuestionStringOperations(QuestionBase):
     questionName = 'Операции над строками'
 
-    def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1, is_simple_task: bool=True):
+    def __init__(self, *, seed: int, num_operations: int=1, min_length: int=30, max_length: int=100, strictness: float=1, is_simple_task: bool=True):
         """
         :param seed: Seed для воспроизводимости тестов.
         :param num_operations: количество операций задачи.
