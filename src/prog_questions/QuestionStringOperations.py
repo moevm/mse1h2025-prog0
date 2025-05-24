@@ -13,7 +13,7 @@ QUESTION_TEXT = """
 <br>
 <b>Ваше условие:</b>
 <br>
-<ul>{operations}</ul>
+<ol>{operations}</ol>
 <br><br>
 <p align="justify">{task_operations_order}</p>
 <h4>Формат входных данных</h4>
