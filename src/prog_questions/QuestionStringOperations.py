@@ -1,4 +1,4 @@
-from .QuestionBase import QuestionBase
+from .QuestionBase import QuestionBase, Result
 from .utility import CProgramRunner, CompilationError, ExecutionError
 from riscv_course.random_expressions.string_operations import generate_operations, generate_input_string, apply_operations, generate_text
 from textwrap import dedent
@@ -159,37 +159,34 @@ class QuestionStringOperations(QuestionBase):
         output = runner.run(input_string)
         expected_output = apply_operations(input_string, self.operations)
         if output == expected_output:
-            return "OK"
+            return Result.Ok()
         else:
-            return f"Ошибка: ожидалось '{expected_output}', получено '{output}'"
+            return Result.Fail(input_string, expected_output, output)
 
-    def test(self, code: str) -> str:
+    def test(self, code: str) -> Result.Ok | Result.Fail:
         if self.is_simple_task:
             code = SIMPLE_HIDDEN_CODE.format(N=self.max_length) + code
-        try:
-            random.seed(self.seed)
-            runner = CProgramRunner(code)
 
-            boundary_inputs = [
-                "", "A", "A" * self.max_length,
-                "123467890", "___  __   _",
-                "BCDFG", "AEIOUY"
-            ]
+        random.seed(self.seed)
+        runner = CProgramRunner(code)
 
-            random_count = 20 + self.strictness * 30
-            random_inputs = [
-                generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(int(random_count))
-            ]
+        boundary_inputs = [
+            "", "A", "A" * self.max_length,
+            "123467890", "___  __   _",
+            "BCDFG", "AEIOUY"
+        ]
 
-            all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
-            for input_string, use_noise in all_inputs:
-                result = self.test_case(runner, input_string, use_noise)
-                if result != "OK":
-                    return result
+        random_count = 20 + self.strictness * 30
+        random_inputs = [
+            generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(int(random_count))
+        ]
 
-            return "OK"
-        except CompilationError as e:
-            return f"Ошибка компиляции: {e}"
-        except ExecutionError as e:
-            return f"Ошибка выполнения (код {e.exit_code}): {e}"
+        all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
+        for input_string, use_noise in all_inputs:
+            result = self.test_case(runner, input_string, use_noise)
+            if result != Result.Ok():
+                return result
+
+        return Result.Ok()
+
 
