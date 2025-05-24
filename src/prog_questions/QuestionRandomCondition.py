@@ -1,4 +1,4 @@
-from .QuestionBase import QuestionBase
+from .QuestionBase import QuestionBase, Result
 from .utility import CProgramRunner, CompilationError, ExecutionError
 from riscv_course.random_expressions.random_condition_loop import Task
 import random
@@ -215,13 +215,11 @@ class QuestionRandomCondition(QuestionBase):
             runner = CProgramRunner(code)
             output = runner.run(input)
             if output == expected_output:
-                return "OK"
+                return Result.Ok()
             else:
-                return f"Ошибка: ожидалось '{expected_output}', получено '{output}'"
-        except CompilationError as e:
-            return f"Ошибка компиляции: {e}"
+                return Result.Fail(input, expected_output, output)
         except ExecutionError as e:
-            return f"Ошибка выполнения (код {e.exit_code}): {e}"
+            return Result.Fail(input, expected_output, f"Ошибка выполнения (код {e.exit_code}): {e}")
 
     # form test: same numbers
     def test_same_numbers_case(self, code: str, amount: int, exponentiation: int) -> str:
