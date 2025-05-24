@@ -102,7 +102,7 @@ class QuestionBase(ABC):
         Логика проверки кода
         code - код, отправленный студентом на проверку
         Возвращаемое значение - Result.Ok - всё хорошо, Result.Fail - не прошёл тест-кейс
-        Вызывает исключения: CompilationError
+        Вызывает исключения: CompilationError, InternalError, EnvironmentError
         '''
         ...
 
@@ -129,13 +129,13 @@ class QuestionBase(ABC):
                 output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.expected, result.got, success]]
 
         except CompilationError as e:
-            output['prologuehtml'] = f'<h4>Ошибка компиляции</h4><p>{str(e)}</p>'
+            output['prologuehtml'] = f"<h4>Ошибка компиляции</h4><p>{str(e).replace(chr(10),'<br>')}</p>"
 
         except (InternalError, EnvironmentError) as e:
-            output['prologuehtml'] = f'<h4>Ошибка сервера (попробуйте позже)</h4><p>{str(e)}</p>'
+            output['prologuehtml'] = f'<h4>Ошибка сервера (попробуйте позже)</h4><p style="font-family: monospace;">{str(e)}</p>'
 
-        except Exception:
-            output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
+        except Exception as e:
+            output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p><p>{str(e)}</p>'
 
         output['fraction'] = 1.0 if success else 0.0
         return json.dumps(output)
