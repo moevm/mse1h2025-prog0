@@ -1,3 +1,4 @@
+import pytest
 from prog_questions import QuestionRandomCondition, utility, Result
 from prog_questions.utility import CompilationError, ExecutionError
 from utility import moodleInit
@@ -48,7 +49,8 @@ class TestQuestionRandomCondition:
         ) == Result.Ok()
 
     def test_code_compile_error(self):
-        assert self.question.test(
+        with pytest.raises(CompilationError):
+            self.question.test(
             r'''
             #include <stdio.h>
 
@@ -79,7 +81,7 @@ class TestQuestionRandomCondition:
             }
 
             '''
-        ) != Result.Ok()
+        )
 
     def test_code_runtime_error(self):
         assert self.question.test(
@@ -175,7 +177,8 @@ class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
         ) == Result.Ok()
 
     def test_code_compile_error(self):
-        assert self.question.test(
+        with pytest.raises(CompilationError):
+            self.question.test(
             r'''
             void random_condition_solver(long long *arr, size_t arr_length) {
                 for (int i = 0; i < arr_length; i++) {
@@ -190,7 +193,7 @@ class TestQuestionRandomConditionSimple(TestQuestionRandomCondition):
                 }
             }
             '''
-        ) != Result.Ok()
+        )
 
     def test_code_runtime_error(self):
         assert self.question.test(
