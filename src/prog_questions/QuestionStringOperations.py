@@ -15,6 +15,7 @@ QUESTION_TEXT = """
 <br>
 <ul>{operations}</ul>
 <br><br>
+<p align="justify">{task_operations_order}</p>
 <h4>Формат входных данных</h4>
 <p align="justify">На вход подается строка по длине не превосходящая <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы, специальные символы (!@#$%^&*()[]{{}}/?|~) и знаки подчеркивания.</p>
 <h4>Формат выходных данных</h4>
@@ -94,6 +95,7 @@ class QuestionStringOperations(QuestionBase):
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness, is_simple_task=is_simple_task)
         self.strictness = strictness
+        self.num_operations = num_operations
         self.operations = generate_operations(seed, num_operations)
         self.min_length = min_length
         self.max_length = max_length
@@ -115,7 +117,8 @@ class QuestionStringOperations(QuestionBase):
                               f"</td><td><code>{apply_operations(string[1], string[0])}<code></td></tr>"
                               for string in input_strings
                               ),
-            task_description=SIMPLE_TASK_DESCRIPTION if self.is_simple_task else TASK_DESCRIPTION
+            task_description=SIMPLE_TASK_DESCRIPTION if self.is_simple_task else TASK_DESCRIPTION,
+            task_operations_order="" if self.num_operations == 1 else "Все операции выполняются последовательно, в порядке, в котором они указаны в тексте задачи.",
         )
 
     @property
