@@ -105,10 +105,10 @@ class QuestionStringOperations(QuestionBase):
     def questionText(self) -> str:
         dedent_question_text = dedent(QUESTION_TEXT)
         input_strings = [
-            ([op], generate_input_string([op], 5, 30)) for op in self.operations
+            ([op], generate_input_string([op], 10, 30)) for op in self.operations
         ]
         if self.num_operations != 1:
-            input_strings.append((self.operations, generate_input_string(self.operations, 5, 50)))
+            input_strings.append((self.operations, generate_input_string(self.operations, 10, 50)))
 
         return dedent_question_text.format(
             max_length=self.max_length,
