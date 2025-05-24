@@ -225,7 +225,7 @@ class QuestionRandomCondition(QuestionBase):
     def test_same_numbers_case(self, code: str, amount: int, exponentiation: int) -> str:
         for serial_number in range(amount):
             upper_edge = self.test_case([10 ** exponentiation] * self.parameters['array_length'], code, serial_number + 1)
-            if upper_edge != "OK":
+            if upper_edge != Result.Ok():
                 return upper_edge
             lower_edge = self.test_case([-10 ** exponentiation] * self.parameters['array_length'], code, serial_number + 1)
             return lower_edge
@@ -243,7 +243,7 @@ class QuestionRandomCondition(QuestionBase):
                     alternating_list.append(small_number)
 
             positive_case = self.test_case(alternating_list, code, serial_number + 1)
-            if positive_case != "OK":
+            if positive_case != Result.Ok():
                 return positive_case
             negative_case = self.test_case([-x for x in alternating_list], code, serial_number + 1)
             return negative_case
@@ -256,9 +256,9 @@ class QuestionRandomCondition(QuestionBase):
                 test_arr.append(random.randint(-(10**upper_border), 10**upper_border))
 
             test_result = self.test_case(test_arr, code, serial_number + 1)
-            if test_result != "OK":
+            if test_result != Result.Ok():
                 return test_result
-        return "OK"
+        return Result.Ok()
 
     def distribute_random_tests(self, total_amount: int, exponentiation_amount: int) -> list:
         random_test_amount = [total_amount // exponentiation_amount] * exponentiation_amount
@@ -278,13 +278,13 @@ class QuestionRandomCondition(QuestionBase):
         # same numbers testing
         for exponentiation in edge_case_exponentiation:
             test_result_same_numbers = self.test_same_numbers_case(code, 1, exponentiation)
-            if test_result_same_numbers != "OK":
+            if test_result_same_numbers != Result.Ok():
                 return test_result_same_numbers
 
         # alternate numbers testing
         for exponentiation in edge_case_exponentiation:
             test_result_alternate_numbers = self.test_alternate_numbers_case(code, 1, exponentiation)
-            if test_result_alternate_numbers != "OK":
+            if test_result_alternate_numbers != Result.Ok():
                 return test_result_alternate_numbers
 
         # random numbers testing
@@ -296,10 +296,10 @@ class QuestionRandomCondition(QuestionBase):
 
         for ind in range(len(random_test_borders)):
             test_result_random_border = self.test_random(code, random_test_amount[ind], random_test_borders[ind])
-            if test_result_random_border != "OK":
+            if test_result_random_border != Result.Ok():
                 return test_result_random_border
 
-        return "OK"
+        return Result.Ok()
 
 if __name__ == "__main__":
     test = QuestionRandomCondition(seed=52, condition_length=10, array_length=10, strictness=0.7)
