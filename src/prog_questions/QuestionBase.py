@@ -1,8 +1,39 @@
 from abc import ABC, abstractmethod
+from typing import final
+from dataclasses import dataclass
 from types import EllipsisType
 import sys
 import json
-from .utility import CommentMetric
+from .utility import CommentMetric, CompilationError, EnvironmentError, InternalError
+
+
+@final
+class Result(ABC):
+    @dataclass(frozen=True)
+    class Ok:
+        '''
+        Успешный результат запуска проверки кода
+        '''
+        pass
+
+    @dataclass(frozen=True)
+    class Fail:
+        '''
+        Тест-кейс не пройден во время проверки кода.
+
+        '''
+        input: str
+        '''
+        Входные данные
+        '''
+        expected: str
+        '''
+        Ожидаемый вывод
+        '''
+        got: str
+        '''
+        Полученный вывод
+        '''
 
 
 class QuestionBase(ABC):
@@ -66,12 +97,12 @@ class QuestionBase(ABC):
         ...
 
     @abstractmethod
-    def test(self, code: str) -> str:
+    def test(self, code: str) -> Result.Ok | Result.Fail:
         '''
         Логика проверки кода
         code - код, отправленный студентом на проверку
-        Возвращаемое значение - строка-результат проверки, которую увидит студент.
-        Если всё хорошо - вернуть "OK"
+        Возвращаемое значение - Result.Ok - всё хорошо, Result.Fail - не прошёл тест-кейс
+        Вызывает исключения: CompilationError, InternalError, EnvironmentError
         '''
         ...
 
@@ -81,15 +112,30 @@ class QuestionBase(ABC):
         code - код, отправленный студентом на проверку
         Возвращаемое значение - JSON в виде строки для отображения результата шаблону-комбинатору
         '''
-        result = self.test(code)
-        success = result == 'OK'
-        output = {
-            'fraction': 1.0 if success else 0.0,
-            'testresults': [['iscorrect', 'Тест', 'Ожидаемый', 'Получено', 'iscorrect'], [success, '#1', 'OK', result, success]],
-        }
 
-        if success:
-            commentsPercent = CommentMetric(code).get_comment_percentage()
-            output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
+        success = False
+        output = {}
 
+        try:
+            result = self.test(code)
+            success = result == Result.Ok()
+
+            if success:
+                output['prologuehtml'] = '<h4>Всё хорошо</h4>'
+                commentsPercent = CommentMetric(code).get_comment_percentage()
+                output['epiloguehtml'] = f'<p>Процент комментариев: {commentsPercent}%</p>'
+            else:
+                output['prologuehtml'] = '<h4>Тесты не пройдены</h4>'
+                output['testresults'] = [['iscorrect', 'Ввод', 'Ожидаемый', 'Получено', 'iscorrect'], [success, result.input, result.expected, result.got, success]]
+
+        except CompilationError as e:
+            output['prologuehtml'] = f"<h4>Ошибка компиляции</h4><p>{str(e).replace(chr(10),'<br>')}</p>"
+
+        except (InternalError, EnvironmentError) as e:
+            output['prologuehtml'] = f'<h4>Ошибка сервера (попробуйте позже)</h4><p style="font-family: monospace;">{str(e)}</p>'
+
+        except Exception:
+            output['prologuehtml'] = f'<h4>Ошибка задания</h4><p>Пожалуйста, свяжитесь с преподавателем (seed задания: {self.seed})</p>'
+
+        output['fraction'] = 1.0 if success else 0.0
         return json.dumps(output)

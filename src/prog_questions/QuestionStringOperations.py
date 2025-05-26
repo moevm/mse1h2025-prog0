@@ -1,4 +1,4 @@
-from .QuestionBase import QuestionBase
+from .QuestionBase import QuestionBase, Result
 from .utility import CProgramRunner, CompilationError, ExecutionError
 from riscv_course.random_expressions.string_operations import generate_operations, generate_input_string, apply_operations, generate_text
 from textwrap import dedent
@@ -13,8 +13,9 @@ QUESTION_TEXT = """
 <br>
 <b>Ваше условие:</b>
 <br>
-<ul>{operations}</ul>
+<ol>{operations}</ol>
 <br><br>
+<p align="justify">{task_operations_order}</p>
 <h4>Формат входных данных</h4>
 <p align="justify">На вход подается строка по длине не превосходящая <code>{max_length}</code>, содержащая латинские буквы (верхний и нижний регистр), цифры, пробелы, специальные символы (!@#$%^&*()[]{{}}/?|~) и знаки подчеркивания.</p>
 <h4>Формат выходных данных</h4>
@@ -82,7 +83,7 @@ def get_operation_html_description(operations):
 class QuestionStringOperations(QuestionBase):
     questionName = 'Операции над строками'
 
-    def __init__(self, *, seed: int, num_operations: int=3, min_length: int=30, max_length: int=100, strictness: float=1, is_simple_task: bool=True):
+    def __init__(self, *, seed: int, num_operations: int=1, min_length: int=30, max_length: int=100, strictness: float=1, is_simple_task: bool=True):
         """
         :param seed: Seed для воспроизводимости тестов.
         :param num_operations: количество операций задачи.
@@ -94,6 +95,7 @@ class QuestionStringOperations(QuestionBase):
         super().__init__(seed=seed, num_operations=num_operations,
                          min_length=min_length, max_length=max_length, strictness=strictness, is_simple_task=is_simple_task)
         self.strictness = strictness
+        self.num_operations = num_operations
         self.operations = generate_operations(seed, num_operations)
         self.min_length = min_length
         self.max_length = max_length
@@ -103,9 +105,10 @@ class QuestionStringOperations(QuestionBase):
     def questionText(self) -> str:
         dedent_question_text = dedent(QUESTION_TEXT)
         input_strings = [
-            ([op], generate_input_string([op], 5, 30)) for op in self.operations
+            ([op], generate_input_string([op], 10, 30)) for op in self.operations
         ]
-        input_strings.append((self.operations, generate_input_string(self.operations, 5, 50)))
+        if self.num_operations != 1:
+            input_strings.append((self.operations, generate_input_string(self.operations, 10, 50)))
 
         return dedent_question_text.format(
             max_length=self.max_length,
@@ -115,7 +118,8 @@ class QuestionStringOperations(QuestionBase):
                               f"</td><td><code>{apply_operations(string[1], string[0])}<code></td></tr>"
                               for string in input_strings
                               ),
-            task_description=SIMPLE_TASK_DESCRIPTION if self.is_simple_task else TASK_DESCRIPTION
+            task_description=SIMPLE_TASK_DESCRIPTION if self.is_simple_task else TASK_DESCRIPTION,
+            task_operations_order="" if self.num_operations == 1 else "Все операции выполняются последовательно, в порядке, в котором они указаны в тексте задачи.",
         )
 
     @property
@@ -153,40 +157,45 @@ class QuestionStringOperations(QuestionBase):
     def test_case(self, runner: CProgramRunner, input_string: str, noise: bool = True):
         if noise:
             input_string = self.noise_input_string(input_string)
-        output = runner.run(input_string)
-        expected_output = apply_operations(input_string, self.operations)
-        if output == expected_output:
-            return "OK"
-        else:
-            return f"Ошибка: ожидалось '{expected_output}', получено '{output}'"
 
-    def test(self, code: str) -> str:
+        expected_output = apply_operations(input_string, self.operations)
+
+        try:
+            output = runner.run(input_string)
+        except ExecutionError as e:
+            return Result.Fail(input_string, expected_output, str(e))
+
+
+        if output == expected_output:
+            return Result.Ok()
+        else:
+            return Result.Fail(input_string, expected_output, output)
+
+    def test(self, code: str) -> Result.Ok | Result.Fail:
         if self.is_simple_task:
             code = SIMPLE_HIDDEN_CODE.format(N=self.max_length) + code
-        try:
-            random.seed(self.seed)
-            runner = CProgramRunner(code)
 
-            boundary_inputs = [
-                "", "A", "A" * self.max_length,
-                "123467890", "___  __   _",
-                "BCDFG", "AEIOUY"
-            ]
+        random.seed(self.seed)
+        runner = CProgramRunner(code)
 
-            random_count = 20 + self.strictness * 30
-            random_inputs = [
-                generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(int(random_count))
-            ]
+        boundary_inputs = [
+            "", "A", "A" * self.max_length,
+            "123467890", "___  __   _",
+            "BCDFG", "AEIOUY"
+        ]
 
-            all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
-            for input_string, use_noise in all_inputs:
-                result = self.test_case(runner, input_string, use_noise)
-                if result != "OK":
-                    return result
+        random_count = 20 + self.strictness * 30
+        random_inputs = [
+            generate_input_string(self.operations, self.min_length, self.max_length) for _ in range(int(random_count))
+        ]
 
-            return "OK"
-        except CompilationError as e:
-            return f"Ошибка компиляции: {e}"
-        except ExecutionError as e:
-            return f"Ошибка выполнения (код {e.exit_code}): {e}"
+        all_inputs = [(s, False) for s in boundary_inputs] + [(s, True) for s in random_inputs]
+
+        for input_string, use_noise in all_inputs:
+            result = self.test_case(runner, input_string, use_noise)
+            if result != Result.Ok():
+                return result
+
+        return Result.Ok()
+
 

@@ -1,5 +1,6 @@
 import pytest
-from prog_questions import QuestionStringOperations, utility
+from prog_questions import QuestionStringOperations, utility, Result
+from prog_questions.utility import CompilationError, ExecutionError
 from utility import moodleInit
 
 SEED_OPERATIONS = [
@@ -88,7 +89,7 @@ def generate_code(is_simple_task, body):
 class TestQuestionStringOperationsVariants:
     @pytest.fixture(autouse=True)
     def setup(self, is_simple_task, strictness):
-        self.question = moodleInit(QuestionStringOperations, seed=52, is_simple_task=is_simple_task, strictness=strictness)
+        self.question = moodleInit(QuestionStringOperations, num_operations=3, seed=52, is_simple_task=is_simple_task, strictness=strictness)
 
     def test_code_preload(self, is_simple_task):
         if is_simple_task:
@@ -102,15 +103,17 @@ class TestQuestionStringOperationsVariants:
 
     def test_code_success_run(self, is_simple_task):
         code = generate_code(is_simple_task, SUCCESS_BODY)
-        assert self.question.test(code) == 'OK'
+        assert self.question.test(code) == Result.Ok()
 
     def test_code_compile_error(self, is_simple_task):
         broken_code = generate_code(is_simple_task, COMPILE_ERROR_BODY)
-        assert 'Ошибка компиляции' in self.question.test(broken_code)
+        with pytest.raises(CompilationError):
+            self.question.test(broken_code)
+
 
     def test_code_runtime_error(self, is_simple_task):
         runtime_error_code = generate_code(is_simple_task, RUNTIME_ERROR_BODY)
-        assert 'Ошибка выполнения' in self.question.test(runtime_error_code)
+        assert self.question.test(runtime_error_code) != Result.Ok()
 
     def test_code_wrong_answer(self, is_simple_task):
         wrong_code = (
@@ -123,4 +126,4 @@ class TestQuestionStringOperationsVariants:
             }
             '''
         )
-        assert 'Ошибка: ожидалось' in self.question.test(wrong_code)
+        assert self.question.test(wrong_code) != Result.Ok()

@@ -16,6 +16,16 @@ class ExecutionError(Exception):
         self.exit_code = exit_code
 
 
+class EnvironmentError(Exception):
+    """Ошибка окружения (файловая система, ресурсы и т.п.)"""
+    pass
+
+
+class InternalError(Exception):
+    """Внутренняя непредвиденная ошибка в работе CProgramRunner"""
+    pass
+
+
 class ExitCodeHandler:
     """Обработчик кодов завершения и сигналов"""
 
@@ -66,57 +76,86 @@ class CProgramRunner:
         :param c_code: Исходный код на C в виде строки
         """
         self.c_code = c_code
-        self.tmp_dir = tempfile.TemporaryDirectory()
-        self.executable_path = self._compile()
         self.exit_code_handler = ExitCodeHandler()
+
+        try:
+            self.tmp_dir = tempfile.TemporaryDirectory()
+        except Exception as e:
+            raise EnvironmentError(f"Не удалось создать временную директорию: {e}")
+
+        try:
+            self.executable_path = self._compile()
+        except CompilationError:
+            raise
+        except InternalError:
+            raise
 
     def _compile(self) -> str:
         """Компиляция кода в исполняемый файл, возвращает путь к исполняемому файлу"""
-        # Сохраняем код в файл
-        src_path = os.path.join(self.tmp_dir.name, 'program.c')
-        with open(src_path, 'w') as f:
-            f.write(self.c_code)
+        try:
+            src_path = os.path.join(self.tmp_dir.name, 'program.c')
+            with open(src_path, 'w', encoding='utf-8') as f:
+                f.write(self.c_code)
 
-        # Компилируем программу
-        exec_path = os.path.join(self.tmp_dir.name, 'program')
-        compile_result = subprocess.run(
-            ['gcc', src_path, '-o', exec_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
+            exec_path = os.path.join(self.tmp_dir.name, 'program')
+            compile_result = subprocess.run(
+                ['gcc', src_path, '-o', exec_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
 
-        if compile_result.returncode != 0:
-            raise CompilationError(compile_result.stderr.decode())
+            if compile_result.returncode != 0:
+                error_msg = compile_result.stderr.decode('utf-8', errors='replace')
+                raise CompilationError(error_msg)
 
-        return exec_path
+            return exec_path
 
-    def run(self, input_data: str = "", timeout: int = 60) -> str:
+        except CompilationError:
+            raise
+        except Exception as e:
+            raise InternalError(f"Внутренняя ошибка при компиляции: {e}")
+
+    def run(self, input_data: str = "", timeout: int = 3) -> str:
         """
         Запуск скомпилированной программы
         :param input_data: Входные данные для программы
         :param timeout: Максимальное время выполнения программы в секундах
         :return: Вывод программы
         """
+        if not self.executable_path or not os.path.isfile(self.executable_path):
+            raise EnvironmentError("Исполняемый файл не скомпилирован или отсутствует")
+
         try:
             run_result = subprocess.run(
                 [self.executable_path],
-                input=input_data.encode(),
+                input=input_data.encode('utf-8'),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 timeout=timeout
             )
+
+            exit_message = self.exit_code_handler.get_exit_message(run_result.returncode)
+            if run_result.returncode != 0:
+                raise ExecutionError(exit_message, run_result.returncode)
+
+            try:
+                output = run_result.stdout.decode('utf-8')
+            except UnicodeDecodeError as e:
+                raise ExecutionError(f"Ошибка декодирования вывода ({e})", run_result.returncode)
+
+            return output.strip()
+
         except subprocess.TimeoutExpired:
-            raise ExecutionError("Программа зациклилась или не завершилась в течение {} секунд".format(timeout), -1)
-
-        exit_message = self.exit_code_handler.get_exit_message(run_result.returncode)
-        if run_result.returncode != 0:
-            raise ExecutionError(
-                message=exit_message,
-                exit_code=run_result.returncode
-            )
-
-        return run_result.stdout.decode().strip()
+            raise ExecutionError(f"Превышено время выполнения ({timeout} с)", 1)
+        except ExecutionError:
+            raise
+        except Exception as e:
+            raise InternalError(f"Внутренняя ошибка при выполнении программы: {e}")
 
     def __del__(self):
         """Очистка временных файлов при удалении объекта"""
-        self.tmp_dir.cleanup()
+        try:
+            if hasattr(self, 'tmp_dir') and self.tmp_dir:
+                self.tmp_dir.cleanup()
+        except Exception:
+            pass

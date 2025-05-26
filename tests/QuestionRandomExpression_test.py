@@ -1,6 +1,7 @@
-from prog_questions import QuestionRandomExpression, utility
+from prog_questions import QuestionRandomExpression, utility, Result
 from prog_questions.utility import CompilationError, ExecutionError
 from utility import moodleInit
+import pytest
 
 
 class TestQuestionRandomExpression:
@@ -30,11 +31,11 @@ class TestQuestionRandomExpression:
             }
             '''
         )
-        assert result == 'OK', f"Ожидалось OK, получено: {result}"
+        assert result == Result.Ok()
 
     def test_compilation_errors(self):
         # Тест 1: Неправильный синтаксис
-        code1 = r'''
+        code = r'''
         #include <stdio.h>
 
         int main() {
@@ -46,11 +47,12 @@ class TestQuestionRandomExpression:
             printf("%d\n", result);
         }
         '''
-        assert "Ошибка компиляции" in self.question.test(code1)
+        with pytest.raises(CompilationError):
+            self.question.test(code)
 
     def test_incorrect_results(self):
         # Тест 1: Неправильный порядок операций
-        code1 = r'''
+        code = r'''
         #include <stdio.h>
 
         int main() {
@@ -63,8 +65,7 @@ class TestQuestionRandomExpression:
             return 0;
         }
         '''
-        res1 = self.question.test(code1)
-        assert res1 != 'OK', "Ожидалась ошибка выполнения, но тест пройден"
+        assert self.question.test(code) != Result.Ok()
 
 
 class TestQuestionRandomExpressionSimpleMode:
@@ -81,27 +82,26 @@ return result;
 }
             '''
         )
-
-        assert result == 'OK', f"""Ожидалось OK, получено: {result}"""
+        assert result == Result.Ok()
 
     def test_compilation_errors(self):
         # Тест 1: Неправильный синтаксис
-        code1 = r'''
+        code = r'''
 int random_expression(int w int x, int y, int z) {
     int result = w * y & w + x - y * w;
     return result;
 }
         '''
-        assert "Ошибка компиляции" in self.question.test(code1)
+        with pytest.raises(CompilationError):
+            self.question.test(code)
 
     #
     def test_incorrect_results(self):
         # Тест 1: Неправильный порядок операций
-        code1 = r'''
+        code = r'''
 int random_expression(int w, int x, int y, int z) {
     int result = w * (y & w) + x - y * w;
     return result;
 }
         '''
-        res1 = self.question.test(code1)
-        assert res1 != 'OK', "Ожидалась ошибка выполнения, но тест пройден"
+        assert self.question.test(code) != Result.Ok()
